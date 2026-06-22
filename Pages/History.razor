@@ -8,6 +8,7 @@
             <th>Date</th>
             <th>Holding</th>
             <th>Amount (native)</th>
+            <th>Fee</th>
             <th>Qty Received</th>
             <th></th>
         </tr>
@@ -20,6 +21,7 @@
                 <td>@t.Date.ToString("dd MMM yyyy")</td>
                 <td>@(holding?.Name ?? "(deleted holding)")</td>
                 <td class="num">@(holding?.Currency ?? "")@t.Amount.ToString("N2")</td>
+                <td class="num">@(t.Fee > 0 ? (holding?.Currency ?? "") + t.Fee.ToString("N2") : "—")</td>
                 <td class="num">@(t.QuantityReceived > 0 ? t.QuantityReceived.ToString("N6") : "—")</td>
                 <td><button class="link-btn" @onclick="() => Remove(t)">✕</button></td>
             </tr>

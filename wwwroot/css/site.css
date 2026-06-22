@@ -115,8 +115,8 @@ td.num.neg {
     color: var(--bad);
 }
 
-td.num.pos {
-    color: var(--good);
+td.num.pos, td.pos {
+    color: var(--good) !important;
 }
 .muted-text { color: var(--muted); font-style: italic; }
 

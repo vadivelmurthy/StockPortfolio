@@ -55,9 +55,10 @@
                 <td class="num">
                     @if (IsMetalTicker(h.TickerSymbol))
                     {
-                        var actualGrams = Store.Data.Transactions
+                        var actualOz = Store.Data.Transactions
                         .Where(t => t.HoldingId == h.Id && t.QuantityReceived > 0)
                         .Sum(t => t.QuantityReceived);
+                        var actualGrams = actualOz * 31.1034768m;
                         if (actualGrams > 0)
                         {
                             <span>@actualGrams.ToString("N4") g</span>
@@ -72,7 +73,7 @@
                         var units = ActualUnits(h);
                         if (units > 0)
                         {
-                            <span>@units.ToString("N4") shares</span>
+                            <span>@units.ToString("N4")</span>
                         }
                         else
                         {
@@ -83,7 +84,7 @@
                 <td class="num">
                     @if (IsMetalTicker(h.TickerSymbol) && _metalPricesPerGramEur.TryGetValue(h.TickerSymbol, out var mp))
                     {
-                        @($"€{mp:N4}/g")
+                        @($"€{mp * 31.1034768m:N2}/oz (€{mp:N4}/g)")
                     }
                     else if (IsMetalTicker(h.TickerSymbol))
                     {
@@ -104,14 +105,19 @@
                 </td>
                 <td class="num">€@InvestedEur(h).ToString("N2")</td>
                 <td class="num">€@ToEur(h).ToString("N2")</td>
-                <td class="num @PnlClass(h)">@PnlText(h)</td>
+                <td class="num" style="@(Pnl(h) >= 0 ? "color:var(--good)" : "color:var(--bad)")">@PnlText(h)</td>
                 <td><button class="link-btn" @onclick="() => Remove(h)">✕</button></td>
             </tr>
         }
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="4"><strong>Total</strong></td>
+            <td class="num"><strong>Total:</strong></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
             <td class="num"><strong>€@TotalInvestedEur().ToString("N2")</strong></td>
             <td class="num"><strong>€@Total().ToString("N2")</strong></td>
             <td class="num @TotalPnlClass()"><strong>@TotalPnlText()</strong></td>
@@ -123,6 +129,7 @@
 <div style="display:flex; gap:0.6rem; margin-top:0.75rem">
     <button class="primary-btn" @onclick="AddHolding">+ Add holding</button>
     <button class="primary-btn" @onclick="GoToContribute">+ Add contribution</button>
+    <button class="primary-btn" @onclick="GoToSell">- Record sale</button>
 </div>
 
 <div class="card" style="margin-top:2rem">
@@ -185,13 +192,15 @@
     private decimal ActualUnits(PortfolioHolding h) =>
         Store.Data.Transactions.Where(t => t.HoldingId == h.Id).Sum(t => t.QuantityReceived);
     private decimal InvestedNative(PortfolioHolding h) =>
-        Store.Data.Transactions.Where(t => t.HoldingId == h.Id).Sum(t => t.Amount);
+           Store.Data.Transactions.Where(t => t.HoldingId == h.Id).Sum(t => t.NetAmount);
+    private decimal TotalFees(PortfolioHolding h) =>
+        Store.Data.Transactions.Where(t => t.HoldingId == h.Id).Sum(t => t.Fee);
     private decimal InvestedEur(PortfolioHolding h) =>
         h.Currency == "USD" ? InvestedNative(h) * Store.Data.UsdToEurRate : InvestedNative(h);
     private decimal ToEur(PortfolioHolding h)
     {
         if (IsMetalTicker(h.TickerSymbol) && _metalPricesPerGramEur.TryGetValue(h.TickerSymbol, out var gpg) && gpg > 0)
-            return ActualUnits(h) * gpg;
+            return ActualUnits(h) * 31.1034768m * gpg;
         if (_livePrices.TryGetValue(h.TickerSymbol, out var price) && price > 0)
         {
             var native = ActualUnits(h) * price;
@@ -237,6 +246,7 @@
     }
 
     private void GoToContribute() => Nav.NavigateTo("/contribute");
+    private void GoToSell() => Nav.NavigateTo("/sell");
 
 
     private void Remove(PortfolioHolding h)

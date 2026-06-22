@@ -9,7 +9,8 @@
             <th>Currency</th>
             <th>Current Value</th>
             <th>Amount to Add</th>
-            <th>Qty Received (metals only)</th>
+            <th>Fee (€/$)</th>
+            <th>Qty Received (shares or XAU/XAG)</th>
             <th>Purchase Date</th>
             <th></th>
             <th></th>
@@ -23,14 +24,15 @@
                 <td>@h.Currency</td>
                 <td class="num">@h.Value.ToString("N2")</td>
                 <td><input type="number" step="0.01" @bind="_amounts[h.Id]" style="width:100px" /></td>
+                <td><input type="number" step="0.01" @bind="_fees[h.Id]" style="width:80px" placeholder="0" /></td>
                 <td>
                     @if (IsMetalTicker(h.TickerSymbol))
                     {
-                        <input type="number" step="0.000001" @bind="_quantities[h.Id]" style="width:110px" placeholder="e.g. 0.080363" />
+                        <input type="number" step="0.000001" @bind="_quantities[h.Id]" style="width:110px" placeholder="XAU/XAG units e.g. 0.080363" />
                     }
                     else
                     {
-                        <span class="muted-text">—</span>
+                        <input type="number" step="0.000001" @bind="_quantities[h.Id]" style="width:110px" placeholder="shares e.g. 0.1627" />
                     }
                 </td>
                 <td><input type="date" @bind="_dates[h.Id]" /></td>
@@ -47,6 +49,7 @@
     private Dictionary<Guid, decimal> _amounts = new();
     private Dictionary<Guid, decimal> _quantities = new();
     private Dictionary<Guid, DateTime> _dates = new();
+    private Dictionary<Guid, decimal> _fees = new();
     private string? _lastMessage;
     protected override void OnInitialized()
     {
@@ -55,6 +58,7 @@
             _amounts[h.Id] = 0;
             _quantities[h.Id] = 0;
             _dates[h.Id] = DateTime.Today;
+            _fees[h.Id] = 0;
         }
     }
     private void AddAmount(PortfolioHolding h)
@@ -64,11 +68,13 @@
         var date = _dates.GetValueOrDefault(h.Id, DateTime.Today);
         h.Value += amount;
         var qty = _quantities.GetValueOrDefault(h.Id, 0);
-        Store.Data.Transactions.Add(new Transaction { HoldingId = h.Id, Date = DateOnly.FromDateTime(date), Amount = amount, QuantityReceived = qty });
+        var fee = _fees.GetValueOrDefault(h.Id, 0);
+        Store.Data.Transactions.Add(new Transaction { HoldingId = h.Id, Date = DateOnly.FromDateTime(date), Amount = amount, Fee = fee, QuantityReceived = qty });
         Store.Save();
         _lastMessage = $"Added {h.Currency} {amount:N2} to {h.Name} on {date:dd MMM yyyy} — new total: {h.Currency} {h.Value:N2}";
         _amounts[h.Id] = 0;
         _quantities[h.Id] = 0;
+        _fees[h.Id] = 0;
     }
     private bool IsMetalTicker(string? ticker) => ticker == "GC=F" || ticker == "SI=F";
 }

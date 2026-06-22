@@ -48,8 +48,10 @@ public class Transaction
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid HoldingId { get; set; }
     public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
-    public decimal Amount { get; set; } // EUR/USD spent
-    public decimal QuantityReceived { get; set; } = 0; // actual XAU/XAG received (metals only)
+    public decimal Amount { get; set; } // total spent including fee
+    public decimal Fee { get; set; } = 0; // Revolut fee/commission
+    public decimal NetAmount => Amount - Fee; // actual investment excluding fee
+    public decimal QuantityReceived { get; set; } = 0;
 }
 public class AppData
 {
