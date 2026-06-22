@@ -1,0 +1,269 @@
+@page "/"
+@inject DataStore Store
+@inject PriceService Prices
+@inject Microsoft.AspNetCore.Components.NavigationManager Nav
+@implements IDisposable
+
+<h1>Portfolio Snapshot</h1>
+<p class="subtitle">
+    Live USD→EUR rate and ticker prices refresh every 10 seconds.
+    @if (_lastRefresh.HasValue)
+    {
+        <span>Last updated @_lastRefresh.Value.ToString("HH:mm:ss")</span>
+    }
+    <button class="link-btn" @onclick="RefreshNow" style="margin-left:0.5rem">↻ refresh now</button>
+</p>
+
+<div class="card">
+    <label>USD → EUR rate (live):
+        <input type="number" step="0.0001" value="@Store.Data.UsdToEurRate" @onchange="e => { Store.Data.UsdToEurRate = ParseDec(e.Value); Store.Save(); }" style="width:100px" />
+    </label>
+    @if (_fxError)
+    {
+        <span style="color:var(--bad); margin-left:0.6rem">live fetch failed — using last known/manual value</span>
+    }
+</div>
+
+<table class="grid">
+    <thead>
+        <tr>
+            <th>Holding</th>
+            <th>Ticker (optional)</th>
+            <th>Start Date</th>
+            <th>Currency</th>
+            <th>Shares/Grams</th>
+            <th>Live Price</th>
+            <th>Invested (€)</th>
+            <th>Current Value (€)</th>
+            <th>Profit/Loss</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var h in Store.Data.Holdings)
+        {
+            <tr>
+                <td><input value="@h.Name" @onchange="e => UpdateName(h, e.Value)" /></td>
+                <td><input value="@h.TickerSymbol" placeholder="e.g. NVDA" style="width:90px" @onchange="e => UpdateTicker(h, e.Value)" /></td>
+                <td><input type="date" value="@h.StartDate.ToString("yyyy-MM-dd")" @onchange="e => { h.StartDate = DateOnly.Parse(e.Value!.ToString()!); Save(); }" /></td>
+                <td>
+                    <select value="@h.Currency" @onchange="e => UpdateCurrency(h, e.Value)">
+                        <option value="EUR">EUR</option>
+                        <option value="USD">USD</option>
+                    </select>
+                </td>
+                <td class="num">
+                    @if (IsMetalTicker(h.TickerSymbol))
+                    {
+                        var actualGrams = Store.Data.Transactions
+                        .Where(t => t.HoldingId == h.Id && t.QuantityReceived > 0)
+                        .Sum(t => t.QuantityReceived);
+                        if (actualGrams > 0)
+                        {
+                            <span>@actualGrams.ToString("N4") g</span>
+                        }
+                        else
+                        {
+                            <span class="muted-text">—</span>
+                        }
+                    }
+                    else
+                    {
+                        var units = ActualUnits(h);
+                        if (units > 0)
+                        {
+                            <span>@units.ToString("N4") shares</span>
+                        }
+                        else
+                        {
+                            <span class="muted-text">—</span>
+                        }
+                    }
+                </td>
+                <td class="num">
+                    @if (IsMetalTicker(h.TickerSymbol) && _metalPricesPerGramEur.TryGetValue(h.TickerSymbol, out var mp))
+                    {
+                        @($"€{mp:N4}/g")
+                    }
+                    else if (IsMetalTicker(h.TickerSymbol))
+                    {
+                        <span class="muted-text">fetching…</span>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(h.TickerSymbol) && _livePrices.TryGetValue(h.TickerSymbol, out var p))
+                    {
+                        @p.ToString("N2")
+                    }
+                    else if (!string.IsNullOrWhiteSpace(h.TickerSymbol))
+                    {
+                        <span class="muted-text">fetching…</span>
+                    }
+                    else
+                    {
+                        <span class="muted-text">—</span>
+                    }
+                </td>
+                <td class="num">€@InvestedEur(h).ToString("N2")</td>
+                <td class="num">€@ToEur(h).ToString("N2")</td>
+                <td class="num @PnlClass(h)">@PnlText(h)</td>
+                <td><button class="link-btn" @onclick="() => Remove(h)">✕</button></td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="4"><strong>Total</strong></td>
+            <td class="num"><strong>€@TotalInvestedEur().ToString("N2")</strong></td>
+            <td class="num"><strong>€@Total().ToString("N2")</strong></td>
+            <td class="num @TotalPnlClass()"><strong>@TotalPnlText()</strong></td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>
+
+<div style="display:flex; gap:0.6rem; margin-top:0.75rem">
+    <button class="primary-btn" @onclick="AddHolding">+ Add holding</button>
+    <button class="primary-btn" @onclick="GoToContribute">+ Add contribution</button>
+</div>
+
+<div class="card" style="margin-top:2rem">
+    <h3>Projection to €250,000</h3>
+    <label>Monthly contribution (€): <input type="number" step="1" @bind="MonthlyContribution" /></label>
+    <label style="margin-left:1rem">Annual return %: <input type="number" step="0.5" @bind="AnnualReturnPct" /></label>
+    <p style="margin-top:1rem">
+        At <strong>@AnnualReturnPct%</strong> annual return with <strong>€@MonthlyContribution</strong>/month,
+        you reach €250,000 in approximately <strong>@YearsToTarget() years @MonthsToTarget() months</strong>.
+    </p>
+</div>
+
+@code {
+    private decimal MonthlyContribution = 995;
+    private decimal AnnualReturnPct = 7;
+    private Timer? _timer;
+    private DateTime? _lastRefresh;
+    private bool _fxError;
+    private Dictionary<string, decimal> _livePrices = new();
+    private Dictionary<string, decimal> _metalPricesPerGramEur = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshNow();
+        _timer = new Timer(async _ => await InvokeAsync(RefreshNow), null, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(10));
+    }
+
+    private async Task RefreshNow()
+    {
+        var rate = await Prices.GetUsdToEurAsync();
+        if (rate.HasValue)
+        {
+            Store.Data.UsdToEurRate = rate.Value;
+            _fxError = false;
+        }
+        else
+        {
+            _fxError = true;
+        }
+
+        var allTickers = Store.Data.Holdings.Select(h => h.TickerSymbol).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct();
+        foreach (var t in allTickers)
+        {
+            if (IsMetalTicker(t))
+            {
+                var pricePerGram = await Prices.GetMetalPricePerGramEurAsync(t);
+                if (pricePerGram.HasValue) _metalPricesPerGramEur[t] = pricePerGram.Value;
+            }
+            else
+            {
+                var price = await Prices.GetStockPriceAsync(t);
+                if (price.HasValue) _livePrices[t] = price.Value;
+            }
+        }
+
+        _lastRefresh = DateTime.Now;
+        Store.Save();
+        StateHasChanged();
+    }
+    private decimal ActualUnits(PortfolioHolding h) =>
+        Store.Data.Transactions.Where(t => t.HoldingId == h.Id).Sum(t => t.QuantityReceived);
+    private decimal InvestedNative(PortfolioHolding h) =>
+        Store.Data.Transactions.Where(t => t.HoldingId == h.Id).Sum(t => t.Amount);
+    private decimal InvestedEur(PortfolioHolding h) =>
+        h.Currency == "USD" ? InvestedNative(h) * Store.Data.UsdToEurRate : InvestedNative(h);
+    private decimal ToEur(PortfolioHolding h)
+    {
+        if (IsMetalTicker(h.TickerSymbol) && _metalPricesPerGramEur.TryGetValue(h.TickerSymbol, out var gpg) && gpg > 0)
+            return ActualUnits(h) * gpg;
+        if (_livePrices.TryGetValue(h.TickerSymbol, out var price) && price > 0)
+        {
+            var native = ActualUnits(h) * price;
+            return h.Currency == "USD" ? native * Store.Data.UsdToEurRate : native;
+        }
+        return InvestedEur(h); // fallback to invested if no live price yet
+    }
+    private decimal Pnl(PortfolioHolding h) => ToEur(h) - InvestedEur(h);
+    private string PnlClass(PortfolioHolding h) => Pnl(h) < 0 ? "neg" : "pos";
+    private string PnlText(PortfolioHolding h)
+    {
+        var invested = InvestedEur(h);
+        if (invested == 0) return "—";
+        var pnl = Pnl(h);
+        var pct = invested != 0 ? (pnl / invested) * 100 : 0;
+        var sign = pnl >= 0 ? "+" : "";
+        return $"{sign}€{pnl:N2} ({sign}{pct:N1}%)";
+    }
+    private decimal TotalInvestedEur() => Store.Data.Holdings.Sum(InvestedEur);
+    private string TotalPnlClass() => (Total() - TotalInvestedEur()) < 0 ? "neg" : "pos";
+    private string TotalPnlText()
+    {
+        var invested = TotalInvestedEur();
+        if (invested == 0) return "—";
+        var pnl = Total() - invested;
+        var pct = (pnl / invested) * 100;
+        var sign = pnl >= 0 ? "+" : "";
+        return $"{sign}€{pnl:N2} ({sign}{pct:N1}%)";
+    }
+    private bool IsMetalTicker(string ticker) => ticker == "GC=F" || ticker == "SI=F";
+    private decimal Total() => Store.Data.Holdings.Sum(ToEur);
+
+    private decimal ParseDec(object? v) => decimal.TryParse(v?.ToString(), out var d) ? d : 0;
+
+    private void UpdateName(PortfolioHolding h, object? v) { h.Name = v?.ToString() ?? ""; Save(); }
+    private void UpdateCurrency(PortfolioHolding h, object? v) { h.Currency = v?.ToString() ?? "EUR"; Save(); }
+    private void UpdateTicker(PortfolioHolding h, object? v) { h.TickerSymbol = v?.ToString()?.Trim().ToUpperInvariant() ?? ""; Save(); }
+
+    private void AddHolding()
+    {
+        Store.Data.Holdings.Add(new PortfolioHolding { Name = "New holding", StartDate = DateOnly.FromDateTime(DateTime.Today) });
+        Save();
+    }
+
+    private void GoToContribute() => Nav.NavigateTo("/contribute");
+
+
+    private void Remove(PortfolioHolding h)
+    {
+        Store.Data.Holdings.Remove(h);
+        Save();
+    }
+
+    private void Save() => Store.Save();
+
+    private (int years, int months) ProjectTarget()
+    {
+        decimal value = Total();
+        decimal target = 250000m;
+        decimal monthlyRate = (AnnualReturnPct / 100m) / 12m;
+        int months = 0;
+        while (value < target && months < 1200)
+        {
+            value += MonthlyContribution;
+            value *= (1 + monthlyRate);
+            months++;
+        }
+        return (months / 12, months % 12);
+    }
+
+    private int YearsToTarget() => ProjectTarget().years;
+    private int MonthsToTarget() => ProjectTarget().months;
+
+    public void Dispose() => _timer?.Dispose();
+}

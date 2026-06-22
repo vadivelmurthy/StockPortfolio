@@ -1,0 +1,106 @@
+@page "/cgt"
+@inject DataStore Store
+
+<h1>CGT Sale Tracker</h1>
+<p class="subtitle">Tracks gains against your annual €1,270 CGT-free allowance. Each tax year is tracked separately.</p>
+
+<div class="tabs">
+    @foreach (var y in Years)
+    {
+        <button class="tab @(y == SelectedYear ? "active" : "")" @onclick="() => SelectedYear = y">@y</button>
+    }
+    <button class="tab add" @onclick="AddYear">+ year</button>
+</div>
+
+<div class="card">
+    <label>Annual CGT-Free Allowance (€): <input type="number" step="1" value="@Store.Data.AnnualCgtAllowance" @onchange="e => { Store.Data.AnnualCgtAllowance = ParseDec(e.Value); Store.Save(); }" /></label>
+</div>
+
+<table class="grid">
+    <thead>
+        <tr>
+            <th>Date Sold</th>
+            <th>Stock/ETF</th>
+            <th>Quantity</th>
+            <th>Cost Basis (€)</th>
+            <th>Sale Price (€)</th>
+            <th>Gain/Loss (€)</th>
+            <th>Running Total (€)</th>
+            <th>Allowance Left (€)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ decimal running = 0; }
+        @foreach (var s in SalesForYear())
+        {
+            running += s.Gain;
+            <tr>
+                <td><input type="date" value="@s.DateSold.ToString("yyyy-MM-dd")" @onchange="e => { s.DateSold = DateOnly.Parse(e.Value!.ToString()!); Store.Save(); }" /></td>
+                <td><input value="@s.StockOrEtf" @onchange="e => UpdateStock(s, e.Value)" /></td>
+                <td><input type="number" step="0.0001" value="@s.Quantity" @onchange="e => { s.Quantity = ParseDec(e.Value); Store.Save(); }" /></td>
+                <td><input type="number" step="0.01" value="@s.CostBasis" @onchange="e => UpdateCostBasis(s, e.Value)" /></td>
+                <td><input type="number" step="0.01" value="@s.SalePrice" @onchange="e => UpdateSalePrice(s, e.Value)" /></td>
+                <td class="num @GainClass(s.Gain)">€@s.Gain.ToString("N2")</td>
+                <td class="num">€@running.ToString("N2")</td>
+                <td class="num">€@(Store.Data.AnnualCgtAllowance - running)</td>
+                <td><button class="link-btn" @onclick="() => RemoveSale(s)">✕</button></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<button class="primary-btn" @onclick="AddSale">+ Add sale</button>
+
+<div class="card status @StatusClass(running)" style="margin-top:1.5rem">
+    <strong>Total gains @SelectedYear: €@running.ToString("N2")</strong><br />
+    @StatusMessage(running)
+</div>
+
+@code {
+    private int SelectedYear = DateTime.Today.Year;
+    private List<int> Years => Store.Data.CgtSales.Select(s => s.DateSold.Year)
+        .Concat(new[] { DateTime.Today.Year })
+        .Concat(_extraYears)
+        .Distinct().OrderBy(y => y).ToList();
+
+    private List<int> _extraYears = new();
+
+    private void AddYear()
+    {
+        var next = Years.Max() + 1;
+        _extraYears.Add(next);
+        SelectedYear = next;
+    }
+
+    private IEnumerable<CgtSale> SalesForYear() => Store.Data.CgtSales.Where(s => s.DateSold.Year == SelectedYear).OrderBy(s => s.DateSold);
+
+    private decimal ParseDec(object? v) => decimal.TryParse(v?.ToString(), out var d) ? d : 0;
+    private string GainClass(decimal gain) => gain < 0 ? "neg" : "";
+    private void UpdateStock(CgtSale s, object? v) { s.StockOrEtf = v?.ToString() ?? ""; Store.Save(); }
+    private void UpdateCostBasis(CgtSale s, object? v) { s.CostBasis = ParseDec(v); Store.Save(); }
+    private void UpdateSalePrice(CgtSale s, object? v) { s.SalePrice = ParseDec(v); Store.Save(); }
+
+    private void AddSale()
+    {
+        Store.Data.CgtSales.Add(new CgtSale { DateSold = new DateOnly(SelectedYear, 1, 1) });
+        Store.Save();
+    }
+
+    private void RemoveSale(CgtSale s)
+    {
+        Store.Data.CgtSales.Remove(s);
+        Store.Save();
+    }
+
+    private string StatusClass(decimal total) => total <= 0 ? "neutral" : (total < Store.Data.AnnualCgtAllowance ? "good" : "bad");
+
+    private string StatusMessage(decimal total)
+    {
+        if (total <= 0) return "No gains logged yet for this year.";
+        if (total < Store.Data.AnnualCgtAllowance)
+            return $"Within allowance — €{(Store.Data.AnnualCgtAllowance - total):N0} remaining tax-free.";
+        var taxable = total - Store.Data.AnnualCgtAllowance;
+        return $"Over allowance — CGT due on €{taxable:N0} at 33% = €{(taxable * 0.33m):N0}.";
+    }
+}

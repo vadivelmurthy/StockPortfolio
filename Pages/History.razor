@@ -1,0 +1,35 @@
+﻿@page "/history"
+@inject DataStore Store
+<h1>Purchase History</h1>
+<p class="subtitle">All logged contributions, most recent first.</p>
+<table class="grid">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Holding</th>
+            <th>Amount (native)</th>
+            <th>Qty Received</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Store.Data.Transactions.OrderByDescending(t => t.Date))
+        {
+            var holding = Store.Data.Holdings.FirstOrDefault(h => h.Id == t.HoldingId);
+            <tr>
+                <td>@t.Date.ToString("dd MMM yyyy")</td>
+                <td>@(holding?.Name ?? "(deleted holding)")</td>
+                <td class="num">@(holding?.Currency ?? "")@t.Amount.ToString("N2")</td>
+                <td class="num">@(t.QuantityReceived > 0 ? t.QuantityReceived.ToString("N6") : "—")</td>
+                <td><button class="link-btn" @onclick="() => Remove(t)">✕</button></td>
+            </tr>
+        }
+    </tbody>
+</table>
+@code {
+    private void Remove(Transaction t)
+    {
+        Store.Data.Transactions.Remove(t);
+        Store.Save();
+    }
+}

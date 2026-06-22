@@ -1,0 +1,70 @@
+@page "/espp"
+@inject DataStore Store
+
+<h1>Optum ESPP Log</h1>
+<p class="subtitle">One row per 6-month vesting cycle. Cost basis = market value (not what you paid) since the discount is already taxed as income via Optum payroll.</p>
+
+<table class="grid">
+    <thead>
+        <tr>
+            <th>Vest Date</th>
+            <th>Monthly Contribution (€)</th>
+            <th>Months</th>
+            <th>Discount %</th>
+            <th>Total Contributed (€)</th>
+            <th>Market Value / Cost Basis (€)</th>
+            <th>Discount Amount (€)</th>
+            <th>Sold?</th>
+            <th>Sale Date</th>
+            <th>Sale Price (€)</th>
+            <th>CGT Gain (€)</th>
+            <th>Reinvestment Split</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Store.Data.EsppCycles.OrderBy(c => c.VestDate))
+        {
+            <tr>
+                <td><input type="date" value="@c.VestDate.ToString("yyyy-MM-dd")" @onchange="e => { c.VestDate = DateOnly.Parse(e.Value!.ToString()!); Store.Save(); }" /></td>
+                <td><input type="number" step="0.01" value="@c.MonthlyContribution" @onchange="e => { c.MonthlyContribution = ParseDec(e.Value); Store.Save(); }" /></td>
+                <td><input type="number" value="@c.MonthsInCycle" style="width:50px" @onchange="e => { c.MonthsInCycle = (int)ParseDec(e.Value); Store.Save(); }" /></td>
+                <td><input type="number" step="0.01" value="@(c.DiscountPercent*100)" style="width:60px" @onchange="e => { c.DiscountPercent = ParseDec(e.Value)/100; Store.Save(); }" />%</td>
+                <td class="num">€@c.TotalContribution.ToString("N2")</td>
+                <td class="num">€@c.MarketValue.ToString("N2")</td>
+                <td class="num">€@c.DiscountAmount.ToString("N2")</td>
+                <td><input type="checkbox" checked="@c.Sold" @onchange="e => { c.Sold = (bool)e.Value!; Store.Save(); }" /></td>
+                <td><input type="date" value="@(c.SaleDate?.ToString("yyyy-MM-dd"))" @onchange="e => { c.SaleDate = string.IsNullOrEmpty(e.Value?.ToString()) ? null : DateOnly.Parse(e.Value!.ToString()!); Store.Save(); }" /></td>
+                <td><input type="number" step="0.01" value="@c.SalePrice" @onchange="e => { c.SalePrice = ParseDec(e.Value); Store.Save(); }" /></td>
+                <td class="num">@(c.CgtGain.HasValue ? "€" + c.CgtGain.Value.ToString("N2") : "—")</td>
+                <td><input value="@c.ReinvestmentSplit" style="width:220px" @onchange="e => UpdateSplit(c, e.Value)" /></td>
+                <td><button class="link-btn" @onclick="() => Remove(c)">✕</button></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<button class="primary-btn" @onclick="AddCycle">+ Add vesting cycle</button>
+
+<div class="card" style="margin-top:1.5rem">
+    <strong>Tip:</strong> when you sell, tick "Sold", enter sale date + price — the CGT gain auto-calculates and you can copy it into the CGT Tracker for that year.
+</div>
+
+@code {
+    private decimal ParseDec(object? v) => decimal.TryParse(v?.ToString(), out var d) ? d : 0;
+    private void UpdateSplit(EsppCycle c, object? v) { c.ReinvestmentSplit = v?.ToString() ?? ""; Store.Save(); }
+
+    private void AddCycle()
+    {
+        var last = Store.Data.EsppCycles.OrderBy(c => c.VestDate).LastOrDefault();
+        var next = last != null ? last.VestDate.AddMonths(6) : DateOnly.FromDateTime(DateTime.Today);
+        Store.Data.EsppCycles.Add(new EsppCycle { VestDate = next });
+        Store.Save();
+    }
+
+    private void Remove(EsppCycle c)
+    {
+        Store.Data.EsppCycles.Remove(c);
+        Store.Save();
+    }
+}
