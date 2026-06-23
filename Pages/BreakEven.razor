@@ -1,0 +1,135 @@
+﻿@page "/breakeven"
+@inject DataStore Store
+@inject PriceService Prices
+@implements IDisposable
+<h1>Break-even Calculator</h1>
+<p class="subtitle">Shows what price each holding needs to reach for you to break even on your investment.</p>
+<table class="grid">
+    <thead>
+        <tr>
+            <th>Holding</th>
+            <th>Ticker</th>
+            <th>Shares/Units</th>
+            <th>Invested (€)</th>
+            <th>Break-even Price</th>
+            <th>Current Price</th>
+            <th>Gap to Break-even</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var h in Store.Data.Holdings)
+        {
+            var units = ActualUnits(h);
+            var invested = InvestedEur(h);
+            var breakEvenPrice = units > 0 ? invested / units : 0;
+            decimal currentPriceEur = 0;
+            if (IsMetalTicker(h.TickerSymbol) && _metalPrices.TryGetValue(h.TickerSymbol, out var mp))
+                currentPriceEur = mp * 31.1034768m; // per oz in EUR
+            else if (_livePrices.TryGetValue(h.TickerSymbol, out var lp))
+                currentPriceEur = h.Currency == "USD" ? lp * Store.Data.UsdToEurRate : lp;
+            var gap = currentPriceEur > 0 ? currentPriceEur - breakEvenPrice : 0;
+            var gapPct = breakEvenPrice > 0 ? (gap / breakEvenPrice) * 100 : 0;
+            var isAboveBreakEven = gap >= 0;
+            <tr>
+                <td>@h.Name</td>
+                <td>@h.TickerSymbol</td>
+                <td class="num">
+                    @if (IsMetalTicker(h.TickerSymbol))
+                    {
+                        @($"{(units * 31.1034768m):N4} g")
+                    }
+                    else
+                    {
+                        @($"{units:N4}")
+                    }
+                </td>
+                <td class="num">€@invested.ToString("N2")</td>
+                <td class="num">
+                    @if (breakEvenPrice > 0)
+                    {
+                        @($"€{breakEvenPrice:N4}")
+                        if (IsMetalTicker(h.TickerSymbol))
+                        {
+                            <span style="color:var(--muted)"> /oz</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="muted-text">—</span>
+                    }
+                </td>
+                <td class="num">
+                    @if (currentPriceEur > 0)
+                    {
+                        @($"€{currentPriceEur:N4}")
+                    }
+                    else
+                    {
+                        <span class="muted-text">fetching…</span>
+                    }
+                </td>
+                <td class="num" style="color:@(isAboveBreakEven ? "var(--good)" : "var(--bad)")">
+                    @if (currentPriceEur > 0 && breakEvenPrice > 0)
+                    {
+                        @($"{(isAboveBreakEven ? "+" : "")}{gap:N4} ({gapPct:N1}%)")
+                    }
+                    else
+                    {
+                        <span class="muted-text">—</span>
+                    }
+                </td>
+                <td>
+                    @if (currentPriceEur > 0 && breakEvenPrice > 0)
+                    {
+                        @(isAboveBreakEven ? "✅ Profitable" : "🔴 Below break-even")
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="card" style="margin-top:1rem">
+    <strong>💡 How break-even is calculated</strong><br />
+    <p style="color:var(--muted); font-size:0.88rem; margin:0.5rem 0 0">
+        Break-even price = Total invested (€, net of fees) ÷ units/shares held.
+        This is the price each share/gram needs to be at for your investment to be worth exactly what you paid.
+        Above break-even = profit. Below = loss. Fees are already excluded from invested amount.
+    </p>
+</div>
+@code {
+    private Dictionary<string, decimal> _livePrices = new();
+    private Dictionary<string, decimal> _metalPrices = new();
+    private Timer? _timer;
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshPrices();
+        _timer = new Timer(async _ => await InvokeAsync(RefreshPrices), null,
+            TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(60));
+    }
+    private async Task RefreshPrices()
+    {
+        foreach (var h in Store.Data.Holdings.Where(h => !string.IsNullOrWhiteSpace(h.TickerSymbol)))
+        {
+            if (IsMetalTicker(h.TickerSymbol))
+            {
+                var p = await Prices.GetMetalPricePerGramEurAsync(h.TickerSymbol);
+                if (p.HasValue) _metalPrices[h.TickerSymbol] = p.Value;
+            }
+            else
+            {
+                var p = await Prices.GetStockPriceAsync(h.TickerSymbol);
+                if (p.HasValue) _livePrices[h.TickerSymbol] = p.Value;
+            }
+        }
+        StateHasChanged();
+    }
+    private decimal ActualUnits(PortfolioHolding h) =>
+        Store.Data.Transactions.Where(t => t.HoldingId == h.Id).Sum(t => t.QuantityReceived);
+    private decimal InvestedNative(PortfolioHolding h) =>
+        Store.Data.Transactions.Where(t => t.HoldingId == h.Id).Sum(t => t.NetAmount);
+    private decimal InvestedEur(PortfolioHolding h) =>
+        h.Currency == "USD" ? InvestedNative(h) * Store.Data.UsdToEurRate : InvestedNative(h);
+    private bool IsMetalTicker(string? t) => t == "GC=F" || t == "SI=F";
+    public void Dispose() => _timer?.Dispose();
+}

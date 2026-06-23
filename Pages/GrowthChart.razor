@@ -1,0 +1,40 @@
+﻿@page "/growth"
+@inject DataStore Store
+<h1>Portfolio Growth</h1>
+<p class="subtitle">Cumulative investment over time based on your transaction history.</p>
+@{
+   var sorted = Store.Data.Transactions
+       .Where(t => t.Amount > 0)
+       .OrderBy(t => t.Date)
+       .ToList();
+   var cumulative = new List<(string date, decimal total)>();
+   decimal running = 0;
+   foreach (var t in sorted)
+   {
+       var holding = Store.Data.Holdings.FirstOrDefault(h => h.Id == t.HoldingId);
+       running += holding?.Currency == "USD" ? t.NetAmount * Store.Data.UsdToEurRate : t.NetAmount;
+       cumulative.Add((t.Date.ToString("dd MMM yy"), running));
+   }
+}
+<div class="card" style="padding:1.5rem">
+<svg viewBox="0 0 800 300" style="width:100%; height:300px">
+       @if (cumulative.Any())
+       {
+           var max = cumulative.Max(c => c.total);
+           var count = cumulative.Count;
+           var points = string.Join(" ", cumulative.Select((c, i) =>
+               $"{(i * 800.0 / (count - 1)).ToString("F0")},{(300 - (double)(c.total / max) * 260 + 20).ToString("F0")}"));
+<polyline points="@points" fill="none" stroke="var(--accent)" stroke-width="2" />
+@for (int i = 0; i < cumulative.Count; i += Math.Max(1, cumulative.Count / 8))
+       {
+           var x = (i * 800.0 / (count - 1));
+<svg:text x="@x.ToString("F0")" y="295" font-size="10" fill="var(--muted)" text-anchor="middle">@cumulative[i].date</svg:text>
+       }
+<svg:text x="10" y="25" font-size="10" fill="var(--muted)">€@max.ToString("N0")</svg:text>
+<svg:text x="10" y="295" font-size="10" fill="var(--muted)">€0</svg:text>
+       }
+</svg>
+<p style="text-align:center; color:var(--muted); font-size:0.85rem; margin-top:0.5rem">
+       Total invested to date: <strong style="color:var(--text)">€@running.ToString("N2")</strong>
+</p>
+</div>

@@ -53,12 +53,44 @@ public class Transaction
     public decimal NetAmount => Amount - Fee; // actual investment excluding fee
     public decimal QuantityReceived { get; set; } = 0;
 }
+
+public class Dividend
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid HoldingId { get; set; }
+    public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    public decimal Amount { get; set; }
+    public string Currency { get; set; } = "EUR";
+    public decimal WithholdingTax { get; set; } = 0;
+}
+
+public class HomeLoan
+{
+    public decimal OriginalAmount { get; set; } = 0;
+    public decimal CurrentBalance { get; set; } = 0;
+    public decimal InterestRate { get; set; } = 0; // annual % e.g. 3.5
+    public int TermYears { get; set; } = 30;
+    public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    public decimal MonthlyPayment { get; set; } = 0;
+    public string LenderName { get; set; } = "";
+    public List<OverPayment> OverPayments { get; set; } = new();
+}
+public class OverPayment
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    public decimal Amount { get; set; }
+    public string Notes { get; set; } = "";
+}
 public class AppData
 {
     public decimal UsdToEurRate { get; set; } = 0.93m;
+    public decimal GbpToEurRate { get; set; } = 1.17m;
     public decimal AnnualCgtAllowance { get; set; } = 1270m;
     public List<CgtSale> CgtSales { get; set; } = new();
     public List<EsppCycle> EsppCycles { get; set; } = new();
     public List<PortfolioHolding> Holdings { get; set; } = new();
     public List<Transaction> Transactions { get; set; } = new();
+    public List<Dividend> Dividends { get; set; } = new();
+    public HomeLoan? Loan { get; set; }
 }

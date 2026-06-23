@@ -1,0 +1,105 @@
+﻿@page "/currency"
+@inject DataStore Store
+<h1>Currency Exposure</h1>
+<p class="subtitle">Breakdown of your portfolio by currency. USD exposure means EUR/USD movements affect your returns.</p>
+@{
+    var holdings = Store.Data.Holdings.ToList();
+    var totalEur = holdings.Sum(h => InvestedEur(h));
+    var grouped = holdings
+        .GroupBy(h => h.Currency)
+        .Select(g => new
+        {
+            Currency = g.Key,
+            TotalEur = g.Sum(h => InvestedEur(h)),
+            Holdings = g.ToList()
+        })
+        .OrderByDescending(g => g.TotalEur)
+        .ToList();
+}
+@* Summary Cards *@
+<div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem">
+    @foreach (var group in grouped)
+    {
+        var pct = totalEur > 0 ? (group.TotalEur / totalEur) * 100 : 0;
+        <div class="card" style="flex:1; min-width:160px">
+            <div style="color:var(--muted); font-size:0.85rem">@group.Currency Exposure</div>
+            <div style="font-size:1.4rem; font-weight:700">€@group.TotalEur.ToString("N2")</div>
+            <div style="color:var(--accent-2)">@pct.ToString("N1")% of portfolio</div>
+        </div>
+    }
+    <div class="card" style="flex:1; min-width:160px">
+        <div style="color:var(--muted); font-size:0.85rem">Total Portfolio</div>
+        <div style="font-size:1.4rem; font-weight:700">€@totalEur.ToString("N2")</div>
+        <div style="color:var(--muted)">invested (net of fees)</div>
+    </div>
+</div>
+@* Visual bar *@
+<div class="card" style="margin-bottom:1.5rem">
+    <strong>Portfolio Split</strong>
+    <div style="display:flex; height:24px; border-radius:6px; overflow:hidden; margin-top:0.75rem; gap:2px">
+        @foreach (var group in grouped)
+        {
+            var pct = totalEur > 0 ? (double)(group.TotalEur / totalEur) * 100 : 0;
+            var color = group.Currency == "EUR" ? "var(--accent)" :
+            group.Currency == "USD" ? "var(--accent-2)" : "var(--muted)";
+            <div style="width:@pct.ToString("F1")%; background:@color; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:white; font-weight:700">
+                @if (pct > 8)
+                {
+                    @($"{group.Currency} {pct:F0}%")
+                }
+            </div>
+        }
+    </div>
+    <div style="display:flex; gap:1.5rem; margin-top:0.5rem; font-size:0.82rem">
+        @foreach (var group in grouped)
+        {
+            var color = group.Currency == "EUR" ? "var(--accent)" :
+            group.Currency == "USD" ? "var(--accent-2)" : "var(--muted)";
+            <span><span style="color:@color">■</span> @group.Currency</span>
+        }
+    </div>
+</div>
+@* Per holding breakdown *@
+<table class="grid">
+    <thead>
+        <tr>
+            <th>Holding</th>
+            <th>Currency</th>
+            <th>Invested (native)</th>
+            <th>Invested (€)</th>
+            <th>% of Portfolio</th>
+            <th>FX Risk</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var h in holdings.OrderByDescending(h => InvestedEur(h)))
+        {
+            var eurVal = InvestedEur(h);
+            var pct = totalEur > 0 ? (eurVal / totalEur) * 100 : 0;
+            var fxRisk = h.Currency == "USD" ? "🟡 USD/EUR moves affect value" :
+            h.Currency == "GBP" ? "🟡 GBP/EUR moves affect value" : "✅ No FX risk";
+            <tr>
+                <td>@h.Name</td>
+                <td>@h.Currency</td>
+                <td class="num">@InvestedNative(h).ToString("N2")</td>
+                <td class="num">€@eurVal.ToString("N2")</td>
+                <td class="num">@pct.ToString("N1")%</td>
+                <td style="font-size:0.82rem">@fxRisk</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="card" style="margin-top:1rem">
+    <strong>💡 What this means for you</strong><br />
+    <p style="color:var(--muted); font-size:0.88rem; margin:0.5rem 0 0">
+        If USD weakens by 5% against EUR, your USD holdings lose ~5% in EUR terms regardless of stock price.
+        Your VUSA and IUSA ETFs track USD assets but are priced in EUR — they have indirect USD exposure.
+        Gold and Silver are globally priced in USD but you hold them in EUR via Revolut's conversion.
+    </p>
+</div>
+@code {
+    private decimal InvestedNative(PortfolioHolding h) =>
+        Store.Data.Transactions.Where(t => t.HoldingId == h.Id).Sum(t => t.NetAmount);
+    private decimal InvestedEur(PortfolioHolding h) =>
+        h.Currency == "USD" ? InvestedNative(h) * Store.Data.UsdToEurRate : InvestedNative(h);
+}

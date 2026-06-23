@@ -1,19 +1,33 @@
 @inherits LayoutComponentBase
-
 <div class="page">
     <div class="sidebar">
-        <div class="brand">🇮🇪 Tax Tracker</div>
+        <div class="brand">🇮🇪 IE Tax Tracker</div>
         <nav>
-            <NavLink href="" Match="Microsoft.AspNetCore.Components.Routing.NavLinkMatch.All">Portfolio Snapshot</NavLink>
-            <NavLink href="contribute">Add Contribution</NavLink>
-            <NavLink href="sell">Record Sale</NavLink>
-            <NavLink href="history">Purchase History</NavLink>
-            <NavLink href="cgt">CGT Tracker</NavLink>
-            <NavLink href="espp">ESPP Log</NavLink>
-            <NavLink href="calendar">Tax Calendar</NavLink>
+            <div class="nav-section">
+                <div class="nav-section-title">📊 Investments</div>
+                <NavLink href="" Match="Microsoft.AspNetCore.Components.Routing.NavLinkMatch.All">Portfolio Snapshot</NavLink>
+                <NavLink href="contribute">Add Contribution</NavLink>
+                <NavLink href="sell">Record Sale</NavLink>
+                <NavLink href="history">Purchase History</NavLink>
+                <NavLink href="monthly">Monthly Summary</NavLink>
+                <NavLink href="growth">Growth Chart</NavLink>
+                <NavLink href="dividends">Dividends</NavLink>
+                <NavLink href="currency">Currency Exposure</NavLink>
+                <NavLink href="breakeven">Break-even</NavLink>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">🏦 Tax</div>
+                <NavLink href="cgt">CGT Tracker</NavLink>
+                <NavLink href="espp">ESPP Log</NavLink>
+                <NavLink href="calendar">Tax Calendar</NavLink>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">🏠 Home Loan</div>
+                <NavLink href="homeloan">Loan Overview</NavLink>
+                <NavLink href="overpayment">Overpayment Planner</NavLink>
+            </div>
         </nav>
     </div>
-
     <main>
         @Body
     </main>

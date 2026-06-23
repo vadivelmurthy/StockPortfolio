@@ -1,0 +1,48 @@
+﻿@page "/monthly"
+@inject DataStore Store
+<h1>Monthly Investment Summary</h1>
+<p class="subtitle">Tracks your monthly contributions vs your €995 target.</p>
+@{
+    var target = 995m;
+    var grouped = Store.Data.Transactions
+        .Where(t => t.Amount > 0)
+        .GroupBy(t => new { t.Date.Year, t.Date.Month })
+        .OrderByDescending(g => g.Key.Year)
+        .ThenByDescending(g => g.Key.Month)
+        .ToList();
+}
+<table class="grid">
+    <thead>
+        <tr>
+            <th>Month</th>
+            <th>Contributions</th>
+            <th>Total (native)</th>
+            <th>Target (€)</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var group in grouped)
+        {
+            var monthName = new DateTime(group.Key.Year, group.Key.Month, 1).ToString("MMMM yyyy");
+            var totalEur = group.Sum(t =>
+            {
+                var holding = Store.Data.Holdings.FirstOrDefault(h => h.Id == t.HoldingId);
+                return holding?.Currency == "USD" ? t.NetAmount * Store.Data.UsdToEurRate : t.NetAmount;
+            });
+            var pct = target > 0 ? (totalEur / target) * 100 : 0;
+            var onTrack = totalEur >= target * 0.9m;
+            <tr>
+                <td><strong>@monthName</strong></td>
+                <td>@group.Count() transactions</td>
+                <td class="num">€@totalEur.ToString("N2")</td>
+                <td class="num">€@target.ToString("N2")</td>
+                <td>
+                    <span style="color:@(onTrack ? "var(--good)" : "var(--bad)")">
+                        @(onTrack ? "✅ On track" : "⚠️ Below target") (@pct.ToString("N0")%)
+                    </span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

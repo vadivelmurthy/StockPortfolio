@@ -1,17 +1,99 @@
 @page "/calendar"
-
-<h1>Annual Irish Tax Calendar</h1>
-
+@inject DataStore Store
+<h1>Irish Tax Calendar</h1>
+<p class="subtitle">Key dates for your Irish tax obligations. Red = urgent, amber = upcoming.</p>
+@{
+    var today = DateOnly.FromDateTime(DateTime.Today);
+    var year = today.Year;
+    var dates = new List<(string when, string action, string notes, DateOnly? deadline)>
+   {
+       (
+           "January",
+           "ESPP vests — sell immediately",
+           "Lock in discount, log in ESPP Log, reinvest into NWG/AZN",
+           new DateOnly(year, 1, 31)
+       ),
+       (
+           "31 Jan",
+           "Pay CGT on December disposals from prior year",
+           "Any shares sold in December must have CGT paid by 31 Jan",
+           new DateOnly(year, 1, 31)
+       ),
+       (
+           "July",
+           "ESPP vests — sell immediately",
+           "Lock in discount, log in ESPP Log, reinvest into NWG/AZN",
+           new DateOnly(year, 7, 31)
+       ),
+       (
+           "Late November",
+           "Sell stocks to use €1,270 CGT allowance",
+           $"CGT used so far this year: €{CgtUsed():N2} — €{CgtRemaining():N2} remaining",
+           new DateOnly(year, 11, 30)
+       ),
+       (
+           "15 Dec",
+           "Pay CGT on Jan–Nov disposals",
+           "File and pay via ROS/myAccount for any gains Jan-Nov",
+           new DateOnly(year, 12, 15)
+       ),
+       (
+           "31 Oct",
+           "File annual tax return (Form 12) + pay income tax",
+           "Declare dividends received, any other non-PAYE income",
+           new DateOnly(year, 10, 31)
+       ),
+       (
+           "31 Oct",
+           "File CGT return (CG1)",
+           "Report all disposals for the year via ROS/myAccount",
+           new DateOnly(year, 10, 31)
+       ),
+       (
+           "Year 7–8 (Feb 2033)",
+           "ETF deemed disposal — VUSA + IUSA",
+           "Revenue treats ETFs as sold every 8 years — 41% exit tax on gain. Plan cash reserve.",
+           new DateOnly(2033, 2, 6)
+       ),
+   };
+    // Sort by deadline
+    var sorted = dates.OrderBy(d => d.deadline ?? new DateOnly(year + 1, 12, 31)).ToList();
+}
 <table class="grid">
     <thead>
-        <tr><th>When</th><th>Action</th><th>Notes</th></tr>
+        <tr>
+            <th>When</th>
+            <th>Action</th>
+            <th>Notes</th>
+            <th>Days Away</th>
+            <th>Status</th>
+        </tr>
     </thead>
     <tbody>
-        <tr><td>January</td><td>ESPP vests — sell immediately</td><td>Lock in the discount; log it in the ESPP Log page</td></tr>
-        <tr><td>July</td><td>ESPP vests — sell immediately</td><td>Lock in the discount; log it in the ESPP Log page</td></tr>
-        <tr><td>Nov (late)</td><td>Sell stocks to use €1,270 CGT allowance</td><td>Check the CGT Tracker — sell enough gains to hit ~€1,270, not over</td></tr>
-        <tr><td>31 Oct</td><td>File CGT return (CG1) + pay tax for Jan–Nov disposals</td><td>Via ROS/myAccount; Dec disposals due by 31 Jan next year</td></tr>
-        <tr><td>31 Oct</td><td>Declare dividends received (NWG/GSK/AZN)</td><td>Include in Form 12 / annual return</td></tr>
-        <tr><td>Year 7–8</td><td>Start reserving cash for ETF deemed disposal</td><td>VUSA/IUSA taxed as if sold every 8 years — 41% exit tax on the gain</td></tr>
+        @foreach (var (when, action, notes, deadline) in sorted)
+        {
+            var daysAway = deadline.HasValue
+            ? (deadline.Value.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days
+            : 999;
+            var rowColor = daysAway < 0 ? "color:var(--muted)" :
+            daysAway <= 14 ? "color:var(--bad)" :
+            daysAway <= 60 ? "color:var(--accent-2)" : "";
+            var status = daysAway < 0 ? "✅ Passed" :
+            daysAway <= 14 ? "🔴 Urgent" :
+            daysAway <= 60 ? "🟡 Upcoming" : "⚪ Future";
+            <tr style="@rowColor">
+                <td><strong>@when</strong></td>
+                <td>@action</td>
+                <td style="font-size:0.82rem; color:var(--muted)">@notes</td>
+                <td class="num">@(daysAway < 0 ? "—" : $"{daysAway}d")</td>
+                <td>@status</td>
+            </tr>
+        }
     </tbody>
 </table>
+@code {
+    private decimal CgtUsed() => Store.Data.CgtSales
+        .Where(s => s.DateSold.Year == DateTime.Today.Year)
+        .Sum(s => s.Gain);
+    private decimal CgtRemaining() => Store.Data.AnnualCgtAllowance - CgtUsed();
+}

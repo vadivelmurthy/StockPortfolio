@@ -1,0 +1,106 @@
+﻿@page "/overpayment"
+@inject DataStore Store
+<h1>Overpayment Planner</h1>
+<p class="subtitle">See how much time and interest you save by making extra payments on your mortgage.</p>
+@{
+    if (Store.Data.Loan == null) { Store.Data.Loan = new IrelandTaxTracker.Models.HomeLoan(); Store.Save(); }
+    var loan = Store.Data.Loan;
+}
+@if (loan.CurrentBalance == 0 || loan.MonthlyPayment == 0)
+{
+    <div class="card">Please set up your loan details on the <a href="/homeloan" style="color:var(--accent)">Loan Overview</a> page first.</div>
+}
+else
+{
+    @* Log an overpayment *@
+    <div class="card" style="margin-bottom:1.5rem">
+        <h3 style="margin-top:0">Log an Overpayment</h3>
+        <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end">
+            <label>Date: <input type="date" @bind="_date" /></label>
+            <label>Amount (€): <input type="number" step="100" @bind="_amount" style="width:110px" /></label>
+            <label>Notes: <input @bind="_notes" placeholder="e.g. annual bonus" style="width:180px" /></label>
+            <button class="primary-btn" @onclick="AddOverpayment">+ Log overpayment</button>
+        </div>
+        @if (_message != null)
+        {
+            <p style="color:var(--good); margin-top:0.5rem">@_message</p>
+        }
+    </div>
+    @* Comparison table *@
+    <h3>What If I Overpay?</h3>
+    <p style="color:var(--muted); font-size:0.88rem">See how much you save with different monthly overpayment amounts.</p>
+    <table class="grid">
+        <thead>
+            <tr>
+                <th>Extra per month</th>
+                <th>Total monthly</th>
+                <th>Months saved</th>
+                <th>Interest saved</th>
+                <th>Payoff date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var extra in new[] { 0m, 100m, 200m, 500m, 1000m })
+            {
+                var (months, interest) = Calculate(loan.CurrentBalance, loan.InterestRate, loan.MonthlyPayment + extra);
+                var (baseMonths, baseInterest) = Calculate(loan.CurrentBalance, loan.InterestRate, loan.MonthlyPayment);
+                var monthsSaved = baseMonths - months;
+                var interestSaved = baseInterest - interest;
+                var payoff = DateTime.Today.AddMonths(months);
+                <tr style="@(extra == 0 ? "" : "color:var(--good)")">
+                    <td>@(extra == 0 ? "No overpayment" : $"+€{extra:N0}/month")</td>
+                    <td class="num">€@((loan.MonthlyPayment + extra).ToString("N0"))</td>
+                    <td class="num">@(extra == 0 ? "—" : $"{monthsSaved} months")</td>
+                    <td class="num">@(extra == 0 ? "—" : $"€{interestSaved:N0}")</td>
+                    <td>@payoff.ToString("MMM yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="card" style="margin-top:1rem">
+        <strong>💡 Irish mortgage tip</strong><br />
+        <p style="color:var(--muted); font-size:0.88rem; margin:0.5rem 0 0">
+            Most Irish lenders allow overpayments without penalty — check your mortgage terms.
+            Even €100/month extra can save tens of thousands in interest over a 30-year term.
+            Overpayments reduce your principal faster, so less interest accrues each month.
+        </p>
+    </div>
+}
+@code {
+    private DateTime _date = DateTime.Today;
+    private decimal _amount;
+    private string _notes = "";
+    private string? _message;
+    private (int months, double interest) Calculate(decimal balance, decimal rate, decimal payment)
+    {
+        var monthlyRate = (double)(rate / 100 / 12);
+        if (monthlyRate <= 0 || payment <= 0) return (0, 0);
+        var monthlyPaymentD = (double)payment;
+        var balanceD = (double)balance;
+        if (monthlyPaymentD <= balanceD * monthlyRate) return (999, 0); // payment too small
+        var months = (int)Math.Ceiling(
+            Math.Log(monthlyPaymentD / (monthlyPaymentD - monthlyRate * balanceD)) /
+            Math.Log(1 + monthlyRate));
+        var totalPaid = monthlyPaymentD * months;
+        var interest = totalPaid - balanceD;
+        return (months, interest);
+    }
+    private void AddOverpayment()
+    {
+        if (_amount <= 0) return;
+        if (Store.Data.Loan == null) { Store.Data.Loan = new IrelandTaxTracker.Models.HomeLoan(); Store.Save(); }
+        var loan = Store.Data.Loan;
+        loan.OverPayments.Add(new IrelandTaxTracker.Models.OverPayment
+        {
+            Date = DateOnly.FromDateTime(_date),
+            Amount = _amount,
+            Notes = _notes
+        });
+        // Also reduce current balance
+        loan.CurrentBalance = Math.Max(0, loan.CurrentBalance - _amount);
+        Store.Save();
+        _message = $"Overpayment of €{_amount:N2} logged. Balance reduced to €{loan.CurrentBalance:N2}.";
+        _amount = 0;
+        _notes = "";
+    }
+}

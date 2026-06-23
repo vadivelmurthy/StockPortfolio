@@ -6,7 +6,7 @@
 
 <h1>Portfolio Snapshot</h1>
 <p class="subtitle">
-    Live USD→EUR rate and ticker prices refresh every 10 seconds.
+    Live USD→EUR rate and ticker prices refresh every 5 seconds.
     @if (_lastRefresh.HasValue)
     {
         <span>Last updated @_lastRefresh.Value.ToString("HH:mm:ss")</span>
@@ -23,6 +23,143 @@
         <span style="color:var(--bad); margin-left:0.6rem">live fetch failed — using last known/manual value</span>
     }
 </div>
+@{
+    var nextVest = Store.Data.EsppCycles
+        .Where(e => !e.Sold && e.VestDate >= DateOnly.FromDateTime(DateTime.Today))
+        .OrderBy(e => e.VestDate)
+        .FirstOrDefault();
+    var daysToVest = nextVest != null
+           ? (nextVest.VestDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days
+           : -1;
+    var cgtUsed = Store.Data.CgtSales
+        .Where(s => s.DateSold.Year == DateTime.Today.Year)
+        .Sum(s => s.Gain);
+    var cgtRemaining = Store.Data.AnnualCgtAllowance - cgtUsed;
+}
+@if (daysToVest >= 0 && daysToVest <= 30)
+{
+    <div class="card status @(daysToVest <= 7 ? "bad" : "neutral")" style="margin-bottom:1rem">
+        <strong>⚠️ ESPP Vesting in @daysToVest days (@nextVest!.VestDate.ToString("dd MMM yyyy"))</strong><br />
+        Remember: sell UHG shares immediately → reinvest 50/50 into NatWest + AstraZeneca
+    </div>
+}
+@if (daysToVest < 0)
+{
+    <div class="card status good" style="margin-bottom:1rem">
+        <strong>✅ No ESPP vesting due in next 30 days</strong>
+    </div>
+}
+@* <div class="card" style="margin-bottom:1rem">
+    <strong>📅 Upcoming Dividends</strong>
+    <table style="width:100%; margin-top:0.5rem; font-size:0.85rem">
+        @foreach (var h in Store.Data.Holdings.Where(h => !IsMetalTicker(h.TickerSymbol) && !string.IsNullOrWhiteSpace(h.TickerSymbol)))
+        {
+            // Get last logged dividend for this holding
+            var lastDiv = Store.Data.Dividends
+            .Where(d => d.HoldingId == h.Id)
+            .OrderByDescending(d => d.Date)
+            .FirstOrDefault();
+            // Calculate next expected date (quarterly = +3 months from last)
+            DateOnly? nextExpected = lastDiv != null
+            ? lastDiv.Date.AddMonths(3)
+            : null;
+            // Get live amount from Yahoo if available
+            var hasLive = _upcomingDividends.TryGetValue(h.TickerSymbol, out var live);
+            var amountPerShare = hasLive && live.amount > 0
+            ? live.amount
+            : lastDiv?.Amount ?? 0;
+            // Use Yahoo ex-date if available, otherwise use calculated next date
+            var exDate = hasLive && live.exDate.HasValue
+            ? live.exDate.Value
+            : nextExpected?.AddDays(-14); // approx ex-date = pay date - 14 days
+            var payDate = hasLive && live.payDate.HasValue
+            ? live.payDate.Value
+            : nextExpected;
+            var daysToEx = exDate.HasValue
+            ? (exDate.Value.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days
+            : -1;
+            // Calculate expected amount based on shares held × amount per share
+            var sharesHeld = ActualUnits(h);
+            var expectedPayout = sharesHeld * amountPerShare;
+            if (amountPerShare == 0 && !hasLive) continue; // skip if no data at all
+                                                           <tr>
+                                                               <td style="padding:0.3rem 0.5rem"><strong>@h.Name</strong></td>
+                                                               <td style="padding:0.3rem 0.5rem">
+                                                                   ~@amountPerShare.ToString("N4") @h.Currency/share
+                    @if (sharesHeld > 0)
+                    {
+                        <span style="color:var(--good)"> → ~@expectedPayout.ToString("N4") @h.Currency total</span>
+                    }
+                </td>
+                <td style="padding:0.3rem 0.5rem">
+                    Ex-div: @(exDate.HasValue? exDate.Value.ToString("dd MMM yyyy") : "—")
+                    @if (daysToEx >= 0 && daysToEx <= 7)
+                    {
+                        <span style="color:var(--bad)"> ⚠️ @daysToEx days!</span>
+                    }
+                    else if (daysToEx < 0 && exDate.HasValue)
+                    {
+                        <span style="color:var(--muted)"> (passed)</span>
+                    }
+                </td>
+                <td style="padding:0.3rem 0.5rem">
+                    Pay: @(payDate.HasValue? payDate.Value.ToString("dd MMM yyyy") : "—")
+                    @if (lastDiv != null)
+                    {
+                        <span style="color:var(--muted)"> (est. from last: @lastDiv.Date.ToString("MMM yyyy"))</span>
+                    }
+                </td>
+            </tr>
+        }
+    </table>
+    <p style="font-size:0.78rem; color:var(--muted); margin:0.5rem 0 0">
+        Amounts from Yahoo Finance. Dates estimated quarterly from last logged dividend.
+        Updates automatically as dividends are logged.
+    </p>
+</div> *@
+<div class="card" style="margin-bottom:1rem; display:flex; gap:2rem; align-items:center">
+    <div>
+        <strong>CGT Allowance @DateTime.Today.Year</strong><br />
+        <span class="muted-text">€@cgtUsed.ToString("N2") used of €@Store.Data.AnnualCgtAllowance.ToString("N2")</span>
+    </div>
+    <div style="flex:1; background:var(--panel-2); border-radius:6px; height:12px; overflow:hidden">
+        <div style="width:@(Math.Min(100, (double)(cgtUsed / Store.Data.AnnualCgtAllowance) * 100))%; height:100%; background:@(cgtRemaining < 0 ? "var(--bad)" : "var(--accent)"); border-radius:6px"></div>
+    </div>
+    <div>
+        <strong style="color:@(cgtRemaining < 0 ? "var(--bad)" : "var(--good)")">€@cgtRemaining.ToString("N2") remaining</strong>
+    </div>
+</div>
+
+@* @{
+    var etfHoldings = Store.Data.Holdings
+        .Where(h => h.TickerSymbol == "VUSA.AS" || h.TickerSymbol == "IUSA.AS")
+        .ToList();
+}
+@if (etfHoldings.Any())
+{
+    <div class="card" style="margin-bottom:1rem">
+        <strong>⏱️ ETF Deemed Disposal Tracker (8-year rule)</strong>
+        <table style="width:100%; margin-top:0.5rem; font-size:0.88rem">
+            @foreach (var etf in etfHoldings)
+            {
+                var dueDate = etf.StartDate.AddYears(8);
+                var daysLeft = (dueDate.ToDateTime(TimeOnly.MinValue) - DateTime.Today).Days;
+                var yearsLeft = daysLeft / 365.0;
+                <tr>
+                    <td style="padding:0.3rem 0.5rem">@etf.Name (@etf.TickerSymbol)</td>
+                    <td style="padding:0.3rem 0.5rem">Started: @etf.StartDate.ToString("MMM yyyy")</td>
+                    <td style="padding:0.3rem 0.5rem">Deemed disposal due: <strong>@dueDate.ToString("MMM yyyy")</strong></td>
+                    <td style="padding:0.3rem 0.5rem; color:@(daysLeft < 365 ? "var(--bad)" : "var(--good)")">
+                        @yearsLeft.ToString("N1") years remaining
+                    </td>
+                </tr>
+            }
+        </table>
+        <p style="margin:0.5rem 0 0; font-size:0.82rem; color:var(--muted)">
+            Sell before deemed disposal date to pay CGT (33%) instead of Exit Tax (41%)
+        </p>
+    </div>
+} *@
 
 <table class="grid">
     <thead>
@@ -50,6 +187,7 @@
                     <select value="@h.Currency" @onchange="e => UpdateCurrency(h, e.Value)">
                         <option value="EUR">EUR</option>
                         <option value="USD">USD</option>
+                        <option value="GBP">GBP</option>
                     </select>
                 </td>
                 <td class="num">
@@ -150,11 +288,12 @@
     private bool _fxError;
     private Dictionary<string, decimal> _livePrices = new();
     private Dictionary<string, decimal> _metalPricesPerGramEur = new();
+    private Dictionary<string, (DateOnly? exDate, DateOnly? payDate, decimal amount)> _upcomingDividends = new();
 
     protected override async Task OnInitializedAsync()
     {
         await RefreshNow();
-        _timer = new Timer(async _ => await InvokeAsync(RefreshNow), null, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(10));
+        _timer = new Timer(async _ => await InvokeAsync(RefreshNow), null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
     }
 
     private async Task RefreshNow()
@@ -169,6 +308,9 @@
         {
             _fxError = true;
         }
+        var gbpRate = await Prices.GetGbpToEurAsync();
+        if (gbpRate.HasValue)
+            Store.Data.GbpToEurRate = gbpRate.Value;
 
         var allTickers = Store.Data.Holdings.Select(h => h.TickerSymbol).Where(t => !string.IsNullOrWhiteSpace(t)).Distinct();
         foreach (var t in allTickers)
@@ -185,6 +327,8 @@
             }
         }
 
+        await FetchAndSaveDividendsAsync();
+        await FetchUpcomingDividendsAsync();
         _lastRefresh = DateTime.Now;
         Store.Save();
         StateHasChanged();
@@ -276,4 +420,63 @@
     private int MonthsToTarget() => ProjectTarget().months;
 
     public void Dispose() => _timer?.Dispose();
+    private async Task FetchAndSaveDividendsAsync()
+    {
+        var stockHoldings = Store.Data.Holdings
+            .Where(h => !string.IsNullOrWhiteSpace(h.TickerSymbol)
+     && !IsMetalTicker(h.TickerSymbol))
+            .ToList();
+        foreach (var h in stockHoldings)
+        {
+            var firstDate = Store.Data.Transactions
+                .Where(t => t.HoldingId == h.Id)
+                .Select(t => t.Date)
+                .OrderBy(d => d)
+                .FirstOrDefault();
+            if (firstDate == default) continue;
+            var recent = await Prices.GetRecentDividendsAsync(h.TickerSymbol, firstDate);
+            foreach (var (date, amountPerShare) in recent)
+            {
+                // Skip future dividends
+                if (date > DateOnly.FromDateTime(DateTime.Today)) continue;
+                // Skip if already logged for this holding and date
+                var alreadyExists = Store.Data.Dividends.Any(d =>
+                    d.HoldingId == h.Id &&
+                    d.Date == date);
+                if (alreadyExists) continue;
+                // Calculate how many shares you held at that dividend date
+                var sharesAtDate = Store.Data.Transactions
+                    .Where(t => t.HoldingId == h.Id && t.Date <= date)
+                    .Sum(t => t.QuantityReceived);
+                if (sharesAtDate <= 0) continue;
+                // Total dividend = shares held × amount per share
+                var totalAmount = Math.Round(sharesAtDate * amountPerShare, 4);
+                // Withholding tax rates
+                var withholdingRate = h.Currency == "USD" ? 0.15m :
+                                      h.Currency == "GBP" ? 0.20m : 0m;
+                var withholdingTax = Math.Round(totalAmount * withholdingRate, 4);
+                Store.Data.Dividends.Add(new Dividend
+                {
+                    HoldingId = h.Id,
+                    Date = date,
+                    Amount = totalAmount,
+                    Currency = h.Currency,
+                    WithholdingTax = withholdingTax
+                });
+            }
+        }
+    }
+    private async Task FetchUpcomingDividendsAsync()
+    {
+        var stockTickers = Store.Data.Holdings
+            .Where(h => !string.IsNullOrWhiteSpace(h.TickerSymbol) && !IsMetalTicker(h.TickerSymbol))
+            .Select(h => h.TickerSymbol)
+            .Distinct();
+        foreach (var ticker in stockTickers)
+        {
+            var result = await Prices.GetUpcomingDividendAsync(ticker);
+            if (result.HasValue)
+                _upcomingDividends[ticker] = result.Value;
+        }
+    }
 }

@@ -1,0 +1,140 @@
+﻿@page "/homeloan"
+@inject DataStore Store
+<h1>Home Loan Overview</h1>
+<p class="subtitle">Track your mortgage balance, interest, and progress toward paying it off.</p>
+@{
+if (Store.Data.Loan == null) { Store.Data.Loan = new IrelandTaxTracker.Models.HomeLoan(); Store.Save(); }
+   var loan = Store.Data.Loan;
+var monthlyRateD = (double)loan.InterestRate / 100.0 / 12.0;
+   var balanceD = (double)loan.CurrentBalance;
+   var paymentD = (double)loan.MonthlyPayment;
+   var remainingMonths = balanceD > 0 && paymentD > 0 && monthlyRateD > 0 && paymentD > monthlyRateD * balanceD
+       ? (int)Math.Ceiling(Math.Log(paymentD / (paymentD - monthlyRateD * balanceD)) / Math.Log(1 + monthlyRateD))
+       : 0;
+   var payoffDate = remainingMonths > 0 ? DateTime.Today.AddMonths(remainingMonths) : (DateTime?)null;
+   var totalInterest = remainingMonths > 0 ? (paymentD * remainingMonths) - balanceD : 0;
+   var paidOff = loan.OriginalAmount > 0 ? ((loan.OriginalAmount - loan.CurrentBalance) / loan.OriginalAmount) * 100 : 0;
+}
+@* Setup card *@
+<div class="card" style="margin-bottom:1.5rem">
+<h3 style="margin-top:0">Loan Details</h3>
+<div style="display:flex; gap:1.5rem; flex-wrap:wrap">
+        <label>Lender: <input value="@loan.LenderName" @onchange="e => UpdateLender(e.Value)" style="width:140px" /></label>
+        <label>Original Amount (€): <input type="number" step="1000" value="@loan.OriginalAmount" @onchange="e => UpdateOriginal(e.Value)" style="width:120px" /></label>
+        <label>Current Balance (€): <input type="number" step="100" value="@loan.CurrentBalance" @onchange="e => UpdateBalance(e.Value)" style="width:120px" /></label>
+        <label>Interest Rate (%): <input type="number" step="0.01" value="@loan.InterestRate" @onchange="e => UpdateRate(e.Value)" style="width:80px" /></label>
+        <label>Term (years): <input type="number" step="1" value="@loan.TermYears" @onchange="e => UpdateTerm(e.Value)" style="width:70px" /></label>
+        <label>Monthly Payment (€): <input type="number" step="10" value="@loan.MonthlyPayment" @onchange="e => UpdatePayment(e.Value)" style="width:110px" /></label>
+        <label>Start Date: <input type="date" value="@loan.StartDate.ToString("yyyy-MM-dd")" @onchange="e => UpdateStartDate(e.Value)" /></label>
+</div>
+</div>
+@if (loan.CurrentBalance > 0 && loan.MonthlyPayment > 0)
+{
+    var totalOverpaid = loan.OverPayments.Sum(o => o.Amount);
+   @* Summary cards *@
+<div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem">
+<div class="card" style="flex:1; min-width:160px">
+<div style="color:var(--muted); font-size:0.85rem">Current Balance</div>
+<div style="font-size:1.4rem; font-weight:700; color:var(--bad)">€@loan.CurrentBalance.ToString("N0")</div>
+</div>
+<div class="card" style="flex:1; min-width:160px">
+<div style="color:var(--muted); font-size:0.85rem">Paid Off</div>
+<div style="font-size:1.4rem; font-weight:700; color:var(--good)">@paidOff.ToString("N1")%</div>
+</div>
+<div class="card" style="flex:1; min-width:160px">
+<div style="color:var(--muted); font-size:0.85rem">Monthly Payment</div>
+<div style="font-size:1.4rem; font-weight:700">€@loan.MonthlyPayment.ToString("N0")</div>
+</div>
+<div class="card" style="flex:1; min-width:160px">
+<div style="color:var(--muted); font-size:0.85rem">Payoff Date</div>
+<div style="font-size:1.2rem; font-weight:700">@(payoffDate?.ToString("MMM yyyy") ?? "—")</div>
+<div style="color:var(--muted); font-size:0.82rem">@remainingMonths months remaining</div>
+</div>
+<div class="card" style="flex:1; min-width:160px">
+<div style="color:var(--muted); font-size:0.85rem">Interest Remaining</div>
+<div style="font-size:1.4rem; font-weight:700; color:var(--bad)">€@totalInterest.ToString("N0")</div>
+</div>
+<div class="card" style="flex:1; min-width:160px">
+<div style="color:var(--muted); font-size:0.85rem">Total Overpaid</div>
+<div style="font-size:1.4rem; font-weight:700; color:var(--good)">€@totalOverpaid.ToString("N0")</div>
+</div>
+</div>
+   @* Progress bar *@
+<div class="card" style="margin-bottom:1.5rem">
+<strong>Loan Progress</strong>
+<div style="background:var(--panel-2); border-radius:6px; height:16px; overflow:hidden; margin-top:0.75rem">
+<div style="width:@paidOff.ToString("F1")%; height:100%; background:var(--good); border-radius:6px"></div>
+</div>
+<div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--muted); margin-top:0.3rem">
+<span>€0</span>
+<span>Paid: €@((loan.OriginalAmount - loan.CurrentBalance).ToString("N0"))</span>
+<span>€@loan.OriginalAmount.ToString("N0")</span>
+</div>
+</div>
+   @* Monthly breakdown *@
+<div class="card" style="margin-bottom:1.5rem">
+<strong>This Month's Payment Breakdown</strong>
+<div style="display:flex; gap:2rem; margin-top:0.75rem">
+           @{
+                var interestThisMonth = loan.CurrentBalance * (loan.InterestRate / 100m / 12m);
+                var principalThisMonth = loan.MonthlyPayment - interestThisMonth;
+           }
+<div>
+<div style="color:var(--muted); font-size:0.82rem">Interest portion</div>
+<div style="font-size:1.1rem; color:var(--bad)">€@interestThisMonth.ToString("N2")</div>
+</div>
+<div>
+<div style="color:var(--muted); font-size:0.82rem">Principal portion</div>
+<div style="font-size:1.1rem; color:var(--good)">€@principalThisMonth.ToString("N2")</div>
+</div>
+<div>
+<div style="color:var(--muted); font-size:0.82rem">Interest rate</div>
+<div style="font-size:1.1rem">@loan.InterestRate%</div>
+</div>
+</div>
+</div>
+}
+@* Overpayment history *@
+@if (loan.OverPayments.Any())
+{
+<h3>Overpayment History</h3>
+<table class="grid" style="margin-bottom:1rem">
+<thead>
+<tr><th>Date</th><th>Amount</th><th>Notes</th><th></th></tr>
+</thead>
+<tbody>
+           @foreach (var op in loan.OverPayments.OrderByDescending(o => o.Date))
+           {
+<tr>
+<td>@op.Date.ToString("dd MMM yyyy")</td>
+<td class="num">€@op.Amount.ToString("N2")</td>
+<td>@op.Notes</td>
+<td><button class="link-btn" @onclick="() => RemoveOverpayment((IrelandTaxTracker.Models.OverPayment)op)">✕</button></td>
+</tr>
+           }
+</tbody>
+<tfoot>
+<tr>
+<td><strong>Total</strong></td>
+<td class="num"><strong>€@loan.OverPayments.Sum(o => o.Amount).ToString("N2")</strong></td>
+<td></td><td></td>
+</tr>
+</tfoot>
+</table>
+}
+@code {
+   private decimal ParseDec(object? v) => decimal.TryParse(v?.ToString(), out var d) ? d : 0;
+   private void Save() => Store.Save();
+    private void RemoveOverpayment(IrelandTaxTracker.Models.OverPayment op)
+    {
+        Store.Data.Loan?.OverPayments.Remove(op);
+        Save();
+    }
+    private void UpdateLender(object? v) { if (Store.Data.Loan != null) { Store.Data.Loan.LenderName = v?.ToString() ?? ""; Save(); } }
+    private void UpdateOriginal(object? v) { if (Store.Data.Loan != null) { Store.Data.Loan.OriginalAmount = ParseDec(v); Save(); } }
+    private void UpdateBalance(object? v) { if (Store.Data.Loan != null) { Store.Data.Loan.CurrentBalance = ParseDec(v); Save(); } }
+    private void UpdateRate(object? v) { if (Store.Data.Loan != null) { Store.Data.Loan.InterestRate = ParseDec(v); Save(); } }
+    private void UpdateTerm(object? v) { if (Store.Data.Loan != null) { Store.Data.Loan.TermYears = (int)ParseDec(v); Save(); } }
+    private void UpdatePayment(object? v) { if (Store.Data.Loan != null) { Store.Data.Loan.MonthlyPayment = ParseDec(v); Save(); } }
+    private void UpdateStartDate(object? v) { if (Store.Data.Loan != null && DateOnly.TryParse(v?.ToString(), out var d)) { Store.Data.Loan.StartDate = d; Save(); } }
+}
