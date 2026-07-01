@@ -49,7 +49,7 @@
         <strong>✅ No ESPP vesting due in next 30 days</strong>
     </div>
 }
-@* <div class="card" style="margin-bottom:1rem">
+<div class="card" style="margin-bottom:1rem">
     <strong>📅 Upcoming Dividends</strong>
     <table style="width:100%; margin-top:0.5rem; font-size:0.85rem">
         @foreach (var h in Store.Data.Holdings.Where(h => !IsMetalTicker(h.TickerSymbol) && !string.IsNullOrWhiteSpace(h.TickerSymbol)))
@@ -116,7 +116,7 @@
         Amounts from Yahoo Finance. Dates estimated quarterly from last logged dividend.
         Updates automatically as dividends are logged.
     </p>
-</div> *@
+</div>
 <div class="card" style="margin-bottom:1rem; display:flex; gap:2rem; align-items:center">
     <div>
         <strong>CGT Allowance @DateTime.Today.Year</strong><br />
@@ -130,7 +130,7 @@
     </div>
 </div>
 
-@* @{
+@{
     var etfHoldings = Store.Data.Holdings
         .Where(h => h.TickerSymbol == "VUSA.AS" || h.TickerSymbol == "IUSA.AS")
         .ToList();
@@ -159,7 +159,7 @@
             Sell before deemed disposal date to pay CGT (33%) instead of Exit Tax (41%)
         </p>
     </div>
-} *@
+}
 
 <table class="grid">
     <thead>
