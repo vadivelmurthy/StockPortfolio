@@ -1,0 +1,2 @@
+cd site\wwwroot
+echo [{"Ticker":"NVDA","Name":"NVIDIA","AlertAbove":300},{"Ticker":"UNH","Name":"UnitedHealth","AlertAbove":600},{"Ticker":"EVTL","Name":"Vertical Aero","AlertTiers":[3,5,8,11]},{"Ticker":"VUSA.AS","Name":"VUSA ETF","AlertAbove":300},{"Ticker":"IUSA.AS","Name":"IUSA ETF","AlertAbove":300},{"Ticker":"GC=F","Name":"Gold","AlertAbove":4600},{"Ticker":"SI=F","Name":"Silver","AlertAbove":200},{"Ticker":"SPCX","Name":"SpaceX","AlertAbove":252},{"Ticker":"AZN","Name":"AstraZeneca","AlertAbove":286}] > holdings.json

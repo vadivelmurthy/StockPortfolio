@@ -13,9 +13,11 @@ public class DataStore
 
     public DataStore()
     {
-        var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "IrelandTaxTracker");
-        Directory.CreateDirectory(folder);
-        _filePath = Path.Combine(folder, "data.json");
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir != null && !dir.GetFiles("*.csproj").Any())
+            dir = dir.Parent;
+        var projectRoot = dir?.FullName ?? AppContext.BaseDirectory;
+        _filePath = Path.Combine(projectRoot, "data.json");
         Data = Load();
     }
 

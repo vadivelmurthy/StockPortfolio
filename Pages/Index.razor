@@ -24,6 +24,58 @@
     }
 </div>
 @{
+    // Goal start: when you began the 8-year journey (Feb 2026)
+    var goalStart = new DateOnly(2026, 2, 1);
+    var goalEnd = goalStart.AddYears(8);           // Feb 2034
+    var today = DateOnly.FromDateTime(DateTime.Today);
+
+    var totalDays = (goalEnd.ToDateTime(TimeOnly.MinValue) - goalStart.ToDateTime(TimeOnly.MinValue)).TotalDays;
+    var elapsedDays = (today.ToDateTime(TimeOnly.MinValue) - goalStart.ToDateTime(TimeOnly.MinValue)).TotalDays;
+    var remainingDays = (goalEnd.ToDateTime(TimeOnly.MinValue) - today.ToDateTime(TimeOnly.MinValue)).TotalDays;
+
+    var pct = Math.Clamp((elapsedDays / totalDays) * 100, 0, 100);
+
+    var yrsLeft = (int)(remainingDays / 365);
+    var monthsLeft = (int)((remainingDays % 365) / 30);
+    var daysLeftDisplay = (int)Math.Max(0, remainingDays);
+
+    var isDue = today >= goalEnd;
+    var isNearing = remainingDays <= 90 && remainingDays > 0;  // final 3 months
+}
+@if (isDue)
+{
+    <div class="sell-now-banner" @onclick="@(() => Nav.NavigateTo("/sell"))" style="cursor:pointer">
+        <div class="sell-now-text">🚨 SELL NOW — 8-YEAR DEADLINE REACHED 🚨</div>
+        <div class="sell-now-sub">Deemed disposal (41% exit tax) is due. Sell ETFs before this date to pay CGT (33%) instead. → Click to record sale</div>
+    </div>
+}
+else
+{
+    <div class="goal-clock-widget @(isNearing ? "nearing" : "")">
+        <div class="goal-clock-header">
+            <span class="goal-clock-title">⏳ 8-Year Goal Clock</span>
+            <span class="goal-clock-target">Target: @goalEnd.ToString("MMM yyyy")</span>
+        </div>
+
+        <div class="goal-clock-countdown">
+            <strong>@yrsLeft</strong>y <strong>@monthsLeft</strong>m
+            <span class="goal-clock-days">(@daysLeftDisplay.ToString("N0") days left)</span>
+        </div>
+
+        <div class="goal-clock-bar">
+            <div class="goal-clock-fill" style="width:@pct.ToString("F1")%"></div>
+        </div>
+
+        <div class="goal-clock-foot">
+            @pct.ToString("F1")% elapsed
+            @if (isNearing)
+            {
+                <span class="goal-clock-warn"> — ⚠️ final 3 months, prepare to sell!</span>
+            }
+        </div>
+    </div>
+}
+@{
     var nextVest = Store.Data.EsppCycles
         .Where(e => !e.Sold && e.VestDate >= DateOnly.FromDateTime(DateTime.Today))
         .OrderBy(e => e.VestDate)
