@@ -324,16 +324,116 @@ else
 
 <div class="card" style="margin-top:2rem">
     <h3>Projection to €250,000</h3>
-    <label>Monthly contribution (€): <input type="number" step="1" @bind="MonthlyContribution" /></label>
-    <label style="margin-left:1rem">Annual return %: <input type="number" step="0.5" @bind="AnnualReturnPct" /></label>
+
+    <p style="color:var(--muted); font-size:0.85rem; margin-top:0">
+        Includes all holdings except your ESPP (UNH). Monthly figure is your real
+        average from logged contributions. Projection uses a forward return assumption.
+    </p>
+
+    <div style="display:flex; gap:2rem; flex-wrap:wrap; margin:1rem 0">
+        <div>
+            <span style="color:var(--muted); font-size:0.8rem">Goal Value (ex-ESPP)</span><br />
+            <strong style="font-size:1.2rem">€@GoalValue().ToString("N2")</strong>
+        </div>
+        <div>
+            <span style="color:var(--muted); font-size:0.8rem">Avg Monthly Investment</span><br />
+            <strong style="font-size:1.2rem; color:var(--good)">€@AutoMonthly().ToString("N2")</strong>
+        </div>
+        <div>
+            <span style="color:var(--muted); font-size:0.8rem">Your Return So Far</span><br />
+            <strong style="font-size:1.2rem; color:@(ActualReturnPct() >= 0 ? "var(--good)" : "var(--bad)")">
+                @(ActualReturnPct() >= 0 ? "+" : "")@ActualReturnPct().ToString("N1")%
+            </strong>
+        </div>
+    </div>
+
+    @if (ActualReturnPct() < 0)
+    {
+        <div class="alert" style="background:#3a2a1a; border:1px solid #7a5a2a; border-radius:8px; padding:0.6rem 1rem; margin-bottom:1rem; font-size:0.85rem">
+            ⚠️ Your portfolio is currently down @Math.Abs(ActualReturnPct()).ToString("N1")%.
+            Early volatility is normal — the projection below uses a long-term assumption,
+            not your short-term return. Once your return turns positive, it'll show here in green.
+        </div>
+    }
+    else
+    {
+        <div class="alert" style="background:#1a3a2a; border:1px solid #2a7a5a; border-radius:8px; padding:0.6rem 1rem; margin-bottom:1rem; font-size:0.85rem">
+            ✅ Your portfolio is up @ActualReturnPct().ToString("N1")% so far — nicely on track.
+        </div>
+    }
+
+    <label>
+        Assumed annual return %:
+        <input type="number" step="0.5" @bind="AnnualReturnPct" style="width:80px" />
+    </label>
+    <label style="margin-left:1rem">
+        Override monthly (€):
+        <input type="number" step="1" @bind="ManualOverride" placeholder="auto" style="width:100px" />
+    </label>
+
     <p style="margin-top:1rem">
-        At <strong>@AnnualReturnPct%</strong> annual return with <strong>€@MonthlyContribution</strong>/month,
-        you reach €250,000 in approximately <strong>@YearsToTarget() years @MonthsToTarget() months</strong>.
+        At <strong>@AnnualReturnPct%</strong> assumed annual return, investing
+        <strong>€@EffectiveMonthly().ToString("N2")</strong>/month from your current
+        <strong>€@GoalValue().ToString("N2")</strong>,
+        you reach <strong>€250,000</strong> in approximately
+        <strong>@YearsToTarget() years @MonthsToTarget() months</strong>.
+    </p>
+</div>
+
+<div class="card" style="margin-top:2rem">
+    <h3>🏁 8-Year Exit Plan — Sell All Except Metals</h3>
+    <p style="color:var(--muted); font-size:0.85rem; margin-top:0">
+        Projects cashing out all stocks &amp; ETFs at your goal date (@ExitDate.ToString("MMM yyyy")),
+        keeping gold &amp; silver. Irish tax: CGT 33% on stocks, exit tax 41% on ETFs — applied to gains only.
+    </p>
+
+    <div style="display:flex; gap:2rem; flex-wrap:wrap; margin-top:1rem">
+
+        @* ── TODAY ── *@
+        <div style="flex:1; min-width:260px; background:var(--panel-2); border-radius:10px; padding:1rem">
+            <h4 style="margin-top:0">If sold today</h4>
+            <div class="exit-row"><span>Holdings sold</span><strong>@SellCountToday()</strong></div>
+            <div class="exit-row"><span>Gross value</span><strong>€@SellValueNow().ToString("N2")</strong></div>
+            <div class="exit-row"><span>Irish tax</span><strong style="color:var(--bad)">−€@TaxNow().ToString("N2")</strong></div>
+            <div class="exit-row exit-total"><span>After-tax</span><strong style="color:var(--good)">€@((SellValueNow() - TaxNow()).ToString("N2"))</strong></div>
+            <div class="exit-row"><span>Return after tax</span><strong style="color:@(ReturnTodayPct() >= 0 ? "var(--good)" : "var(--bad)")">@(ReturnTodayPct() >= 0 ? "+" : "")@ReturnTodayPct().ToString("N1")%</strong></div>
+        </div>
+
+        @* ── 2034 ── *@
+        <div style="flex:1; min-width:260px; background:var(--panel-2); border-radius:10px; padding:1rem">
+            <h4 style="margin-top:0">Projected @ExitDate.Year (@MonthsToExit() months away)</h4>
+            <div class="exit-row"><span>Gross value</span><strong>€@ProjectedValue2034().ToString("N2")</strong></div>
+            <div class="exit-row"><span>Total invested by then</span><strong>€@ProjectedInvested2034().ToString("N2")</strong></div>
+            <div class="exit-row"><span>Irish tax</span><strong style="color:var(--bad)">−€@Tax2034().ToString("N2")</strong></div>
+            <div class="exit-row exit-total"><span>After-tax</span><strong style="color:var(--good)">€@((ProjectedValue2034() - Tax2034()).ToString("N2"))</strong></div>
+            <div class="exit-row"><span>Return after tax</span><strong style="color:@(Return2034Pct() >= 0 ? "var(--good)" : "var(--bad)")">@(Return2034Pct() >= 0 ? "+" : "")@Return2034Pct().ToString("N1")%</strong></div>
+            <div class="exit-row"><span>Per year (annualized)</span><strong style="color:var(--good)">@(AnnualizedReturn2034() >= 0 ? "+" : "")@AnnualizedReturn2034().ToString("N1")%/yr</strong></div>
+        </div>
+    </div>
+    <div style="margin-top:1rem; border-top:1px solid #444; padding-top:0.75rem">
+        <h4 style="margin-top:0">Scenario range (after-tax)</h4>
+        <div class="exit-row">
+            <span>😟 Conservative (4%)</span>
+            <strong>€@ProjectedAfterTaxAt(4).ToString("N0")</strong>
+        </div>
+        <div class="exit-row">
+            <span>😐 Expected (7%)</span>
+            <strong style="color:var(--good)">€@ProjectedAfterTaxAt(7).ToString("N0")</strong>
+        </div>
+        <div class="exit-row">
+            <span>😄 Optimistic (10%)</span>
+            <strong>€@ProjectedAfterTaxAt(10).ToString("N0")</strong>
+        </div>
+    </div>
+
+    <p style="font-size:0.78rem; color:var(--muted); margin-top:1rem">
+        Assumes @AnnualReturnPct% annual return and €@ExitMonthly().ToString("N0")/month contributions until @ExitDate.ToString("MMM yyyy").
+        Gold &amp; silver are kept, not sold. Estimates only — not tax advice.
     </p>
 </div>
 
 @code {
-    private decimal MonthlyContribution = 995;
+    private decimal MonthlyContribution = 1000;
     private decimal AnnualReturnPct = 7;
     private Timer? _timer;
     private DateTime? _lastRefresh;
@@ -341,6 +441,8 @@ else
     private Dictionary<string, decimal> _livePrices = new();
     private Dictionary<string, decimal> _metalPricesPerGramEur = new();
     private Dictionary<string, (DateOnly? exDate, DateOnly? payDate, decimal amount)> _upcomingDividends = new();
+    private decimal? ManualOverride = null;
+    private DateOnly ExitDate = new DateOnly(2034, 2, 1);
 
     protected override async Task OnInitializedAsync()
     {
@@ -455,19 +557,57 @@ else
 
     private (int years, int months) ProjectTarget()
     {
-        decimal value = Total();
+        decimal value = GoalValue();
         decimal target = 250000m;
+        decimal monthly = EffectiveMonthly();
         decimal monthlyRate = (AnnualReturnPct / 100m) / 12m;
+
         int months = 0;
         while (value < target && months < 1200)
         {
-            value += MonthlyContribution;
+            value += monthly;
             value *= (1 + monthlyRate);
             months++;
         }
         return (months / 12, months % 12);
     }
 
+    private int MonthsInvesting()
+    {
+        var tx = Store.Data.Transactions;
+        if (!tx.Any()) return 1;
+        var first = tx.Min(t => t.Date);
+        var months = ((DateTime.Today.Year - first.Year) * 12)
+                     + DateTime.Today.Month - first.Month;
+        return Math.Max(1, months);
+    }
+
+    // Auto monthly = total invested (ex-ESPP) ÷ months investing
+    private decimal AutoMonthly() =>
+        Math.Round(GoalInvested() / MonthsInvesting(), 2);
+
+    private decimal EffectiveMonthly() =>
+        ManualOverride.HasValue && ManualOverride.Value > 0
+            ? ManualOverride.Value
+            : AutoMonthly();
+
+    private bool CountsToGoal(PortfolioHolding h) => true;
+
+    // Current value of goal-counting holdings (includes metals, excludes ESPP)
+    private decimal GoalValue() =>
+        Store.Data.Holdings.Where(CountsToGoal).Sum(h => ToEur(h));
+
+    // Total invested into goal-counting holdings
+    private decimal GoalInvested() =>
+        Store.Data.Holdings.Where(CountsToGoal).Sum(h => InvestedEur(h));
+
+    // Your ACTUAL return so far (a real fact, not an assumption)
+    private decimal ActualReturnPct()
+    {
+        var invested = GoalInvested();
+        if (invested == 0) return 0;
+        return ((GoalValue() - invested) / invested) * 100m;
+    }
     private int YearsToTarget() => ProjectTarget().years;
     private int MonthsToTarget() => ProjectTarget().months;
 
@@ -530,5 +670,137 @@ else
             if (result.HasValue)
                 _upcomingDividends[ticker] = result.Value;
         }
+    }
+    private bool IsSold(PortfolioHolding h) => !IsMetalTicker(h.TickerSymbol);
+
+    private bool IsEtf(PortfolioHolding h) =>
+    h.TickerSymbol == "VUSA.AS" || h.TickerSymbol == "IUSA.AS";
+
+    private int SellCountToday() =>
+    Store.Data.Holdings.Count(IsSold);
+
+    private decimal SellValueNow() =>
+        Store.Data.Holdings.Where(IsSold).Sum(h => ToEur(h));
+
+    private decimal SellInvestedNow() =>
+        Store.Data.Holdings.Where(IsSold).Sum(h => InvestedEur(h));
+
+    private decimal TaxNow()
+    {
+        decimal tax = 0;
+        foreach (var h in Store.Data.Holdings.Where(IsSold))
+        {
+            var gain = ToEur(h) - InvestedEur(h);
+            if (gain > 0)
+                tax += gain * (IsEtf(h) ? 0.41m : 0.33m);
+        }
+        return tax;
+    }
+
+    private int MonthsToExit()
+    {
+        var months = ((ExitDate.Year - DateTime.Today.Year) * 12)
+                     + ExitDate.Month - DateTime.Today.Month;
+        return Math.Max(0, months);
+    }
+
+    private decimal ExitMonthly() => EffectiveMonthly();
+
+    private decimal ProjectedValue2034()
+    {
+        decimal value = SellValueNow();
+        decimal monthly = ExitMonthly();
+        decimal rate = (AnnualReturnPct / 100m) / 12m;
+        for (int m = 0; m < MonthsToExit(); m++)
+        {
+            value += monthly;
+            value *= (1 + rate);
+        }
+        return value;
+    }
+
+    private decimal ProjectedInvested2034() =>
+    SellInvestedNow() + ExitMonthly() * MonthsToExit();
+
+    // Blended tax rate on projected gain (weighted by current ETF share)
+    private decimal Tax2034()
+    {
+        var gain = ProjectedValue2034() - ProjectedInvested2034();
+        if (gain <= 0) return 0;
+
+        decimal etfVal = Store.Data.Holdings.Where(h => IsSold(h) && IsEtf(h)).Sum(h => ToEur(h));
+        decimal totalVal = SellValueNow();
+        decimal etfShare = totalVal > 0 ? etfVal / totalVal : 0;
+        decimal blendedRate = etfShare * 0.41m + (1 - etfShare) * 0.33m;
+        return gain * blendedRate;
+    }
+
+    private decimal ReturnTodayPct()
+    {
+        var invested = SellInvestedNow();
+        if (invested == 0) return 0;
+        var afterTax = SellValueNow() - TaxNow();
+        return ((afterTax - invested) / invested) * 100m;
+    }
+    // Return % after tax — projected 2034
+    private decimal Return2034Pct()
+    {
+        var invested = ProjectedInvested2034();
+        if (invested == 0) return 0;
+        var afterTax = ProjectedValue2034() - Tax2034();
+        return ((afterTax - invested) / invested) * 100m;
+    }
+
+    private decimal AnnualizedReturn2034()
+    {
+        int months = MonthsToExit();
+        if (months <= 0) return 0;
+        decimal start = SellValueNow() - TaxNow();       // after-tax value today
+        decimal monthly = ExitMonthly();
+        decimal payout = ProjectedValue2034() - Tax2034();
+        // Build cash flows: outflow today, monthly outflows, final inflow
+        var flows = new List<double>();
+        flows.Add(-(double)start);
+        for (int m = 0; m < months - 1; m++)
+            flows.Add(-(double)monthly);
+        flows.Add(-(double)monthly + (double)payout);
+        // Bisection solve for monthly IRR
+        double lo = -0.99, hi = 1.0;
+        for (int i = 0; i < 200; i++)
+        {
+            double mid = (lo + hi) / 2;
+            double npv = 0;
+            for (int j = 0; j < flows.Count; j++)
+                npv += flows[j] / Math.Pow(1 + mid, j);
+            if (npv > 0) lo = mid; else hi = mid;
+        }
+        double monthlyIrr = (lo + hi) / 2;
+        double annualIrr = Math.Pow(1 + monthlyIrr, 12) - 1;
+        return (decimal)(annualIrr * 100);
+    }
+    private decimal ProjectedValueAt(decimal annualPct)
+    {
+        decimal value = SellValueNow();
+        decimal monthly = ExitMonthly();
+        decimal rate = (annualPct / 100m) / 12m;
+        for (int m = 0; m < MonthsToExit(); m++)
+        {
+            value += monthly;
+            value *= (1 + rate);
+        }
+        return value;
+    }
+    // After-tax version for a given rate
+    private decimal ProjectedAfterTaxAt(decimal annualPct)
+    {
+        decimal gross = ProjectedValueAt(annualPct);
+        decimal invested = ProjectedInvested2034();
+        decimal gain = gross - invested;
+        if (gain <= 0) return gross;
+        decimal etfVal = Store.Data.Holdings.Where(h => IsSold(h) && IsEtf(h)).Sum(h => ToEur(h));
+        decimal totalVal = SellValueNow();
+        decimal etfShare = totalVal > 0 ? etfVal / totalVal : 0;
+        decimal blendedRate = etfShare * 0.41m + (1 - etfShare) * 0.33m;
+        return gross - (gain * blendedRate);
     }
 }
