@@ -1,6 +1,6 @@
 {
-  "UsdToEurRate": 0.87352,
-  "GbpToEurRate": 1.1666,
+  "UsdToEurRate": 0.87451,
+  "GbpToEurRate": 1.1751,
   "AnnualCgtAllowance": 1270,
   "CgtSales": [
     {
@@ -179,7 +179,7 @@
       "Id": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
       "Name": "NVIDIA",
       "StartDate": "2026-02-06",
-      "Value": 60,
+      "Value": 267,
       "Currency": "USD",
       "TickerSymbol": "NVDA",
       "IsMetal": false,
@@ -191,7 +191,7 @@
       "Id": "8f8428f3-0436-4a35-a56b-006e6fdfb5c1",
       "Name": "Vertical Aerospace",
       "StartDate": "2026-02-06",
-      "Value": 142.03,
+      "Value": 292.12,
       "Currency": "USD",
       "TickerSymbol": "EVTL",
       "IsMetal": false,
@@ -236,30 +236,6 @@
       "InvestedAmount": 0
     },
     {
-      "Id": "cdd297b0-5ce9-4194-baa7-f4a37ca1a423",
-      "Name": "Gold (XAU)",
-      "StartDate": "2026-03-06",
-      "Value": 0,
-      "Currency": "EUR",
-      "TickerSymbol": "GC=F",
-      "IsMetal": false,
-      "GramsHeld": 0,
-      "SharesHeld": 0,
-      "InvestedAmount": 0
-    },
-    {
-      "Id": "4385356c-9b3a-4df4-b9a2-7d5b70379873",
-      "Name": "Silver (XAG)",
-      "StartDate": "2026-03-06",
-      "Value": 0,
-      "Currency": "EUR",
-      "TickerSymbol": "SI=F",
-      "IsMetal": false,
-      "GramsHeld": 0,
-      "SharesHeld": 0,
-      "InvestedAmount": 0
-    },
-    {
       "Id": "f0f20476-30a4-49cf-8b28-83e0b9df0f6e",
       "Name": "NatWest",
       "StartDate": "2026-06-23",
@@ -275,9 +251,45 @@
       "Id": "1f103c25-0ca7-4bd1-b518-5a0ac3d807a7",
       "Name": "Astra Zeneca",
       "StartDate": "2026-07-01",
-      "Value": 60,
+      "Value": 69.99,
       "Currency": "USD",
       "TickerSymbol": "AZN",
+      "IsMetal": false,
+      "GramsHeld": 0,
+      "SharesHeld": 0,
+      "InvestedAmount": 0
+    },
+    {
+      "Id": "cdd297b0-5ce9-4194-baa7-f4a37ca1a423",
+      "Name": "Gold (XAU)",
+      "StartDate": "2026-03-06",
+      "Value": 293.37,
+      "Currency": "EUR",
+      "TickerSymbol": "GC=F",
+      "IsMetal": false,
+      "GramsHeld": 0,
+      "SharesHeld": 0,
+      "InvestedAmount": 0
+    },
+    {
+      "Id": "4385356c-9b3a-4df4-b9a2-7d5b70379873",
+      "Name": "Silver (XAG)",
+      "StartDate": "2026-03-06",
+      "Value": 97.31,
+      "Currency": "EUR",
+      "TickerSymbol": "SI=F",
+      "IsMetal": false,
+      "GramsHeld": 0,
+      "SharesHeld": 0,
+      "InvestedAmount": 0
+    },
+    {
+      "Id": "beed710a-7dd0-44fd-9161-7a8c41d9bc25",
+      "Name": "Space X",
+      "StartDate": "2026-07-20",
+      "Value": 621,
+      "Currency": "USD",
+      "TickerSymbol": "SPCX",
       "IsMetal": false,
       "GramsHeld": 0,
       "SharesHeld": 0,
@@ -1049,6 +1061,69 @@
       "Fee": 0,
       "NetAmount": 60,
       "QuantityReceived": 0.30232793
+    },
+    {
+      "Id": "adfc5cf7-4992-428f-b1b0-3a92b8234535",
+      "HoldingId": "1f103c25-0ca7-4bd1-b518-5a0ac3d807a7",
+      "Date": "2026-07-07",
+      "Amount": 4.99,
+      "Fee": 0,
+      "NetAmount": 4.99,
+      "QuantityReceived": 0.0203264
+    },
+    {
+      "Id": "4a2e1717-bd69-45f9-bd10-8bf64344165e",
+      "HoldingId": "cdd297b0-5ce9-4194-baa7-f4a37ca1a423",
+      "Date": "2026-07-09",
+      "Amount": 150,
+      "Fee": 0,
+      "NetAmount": 150,
+      "QuantityReceived": 0
+    },
+    {
+      "Id": "1807b9bb-b33d-4e68-9adb-48ef1a85a899",
+      "HoldingId": "4385356c-9b3a-4df4-b9a2-7d5b70379873",
+      "Date": "2026-07-09",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 0
+    },
+    {
+      "Id": "ebd54104-0616-458f-97a5-67a3cd9abfe4",
+      "HoldingId": "1f103c25-0ca7-4bd1-b518-5a0ac3d807a7",
+      "Date": "2026-07-09",
+      "Amount": 5,
+      "Fee": 0,
+      "NetAmount": 5,
+      "QuantityReceived": 0.0203264
+    },
+    {
+      "Id": "babef97c-fcfd-4094-8548-0facd04ead02",
+      "HoldingId": "8f8428f3-0436-4a35-a56b-006e6fdfb5c1",
+      "Date": "2026-07-13",
+      "Amount": 150.09,
+      "Fee": 0,
+      "NetAmount": 150.09,
+      "QuantityReceived": 90.081
+    },
+    {
+      "Id": "94751137-280d-47d8-89af-c754e6f0e4e0",
+      "HoldingId": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
+      "Date": "2026-07-16",
+      "Amount": 207,
+      "Fee": 0,
+      "NetAmount": 207,
+      "QuantityReceived": 1.00378237
+    },
+    {
+      "Id": "e40c6d93-9183-42c8-9790-18625ed2f863",
+      "HoldingId": "beed710a-7dd0-44fd-9161-7a8c41d9bc25",
+      "Date": "2026-07-20",
+      "Amount": 621,
+      "Fee": 0,
+      "NetAmount": 621,
+      "QuantityReceived": 4.95379946
     }
   ],
   "Dividends": [
@@ -1117,5 +1192,14 @@
       "WithholdingTax": 0.0000
     }
   ],
-  "Loan": null
+  "Loan": {
+    "OriginalAmount": 0,
+    "CurrentBalance": 0,
+    "InterestRate": 0,
+    "TermYears": 30,
+    "StartDate": "2026-07-10",
+    "MonthlyPayment": 0,
+    "LenderName": "",
+    "OverPayments": []
+  }
 }

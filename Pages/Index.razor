@@ -224,6 +224,7 @@ else
             <th>Live Price</th>
             <th>Invested (€)</th>
             <th>Current Value (€)</th>
+            <th>Target Progress</th>
             <th>Profit/Loss</th>
             <th></th>
         </tr>
@@ -295,6 +296,33 @@ else
                 </td>
                 <td class="num">€@InvestedEur(h).ToString("N2")</td>
                 <td class="num">€@ToEur(h).ToString("N2")</td>
+                <td style="min-width:180px">
+                    @{
+                        var target = TargetFor(h.TickerSymbol);
+                        var held = IsMetalTicker(h.TickerSymbol) ? MetalGrams(h) : ActualUnits(h);
+                    }
+                    @if (target > 0)
+                    {
+                        var remaining = Math.Max(0, target - held);
+                        var targetPct = target > 0 ? Math.Min(100, (double)(held / target) * 100) : 0;
+                        <div style="font-size:0.8rem; margin-bottom:0.2rem">
+                            <strong>@held.ToString("N2")</strong> / @target.ToString("N0") @(IsMetalTicker(h.TickerSymbol) ? "g" : "sh")
+                            <span style="color:var(--muted)"> · @remaining.ToString("N2") to go</span>
+                        </div>
+                        <div style="background:#0d1526; border-radius:5px; height:8px; overflow:hidden">
+                            <div style="width:@targetPct.ToString("F1")%; height:100%;
+                background:@(targetPct >= 100 ? "var(--good)" : "linear-gradient(90deg,#4da6ff,#00d4aa)");
+                border-radius:5px"></div>
+                        </div>
+                        <div style="font-size:0.72rem; color:var(--muted); margin-top:0.15rem">
+                            @targetPct.ToString("F1")% @(targetPct >= 100 ? "✅ goal reached!" : "")
+                        </div>
+                    }
+                    else
+                    {
+                        <span style="color:var(--muted); font-size:0.8rem">—</span>
+                    }
+                </td>
                 <td class="num" style="@(Pnl(h) >= 0 ? "color:var(--good)" : "color:var(--bad)")">@PnlText(h)</td>
                 <td><button class="link-btn" @onclick="() => Remove(h)">✕</button></td>
             </tr>
@@ -310,6 +338,7 @@ else
             <td></td>
             <td class="num"><strong>€@TotalInvestedEur().ToString("N2")</strong></td>
             <td class="num"><strong>€@Total().ToString("N2")</strong></td>
+            <td></td>
             <td class="num @TotalPnlClass()"><strong>@TotalPnlText()</strong></td>
             <td></td>
         </tr>
@@ -802,5 +831,29 @@ else
         decimal etfShare = totalVal > 0 ? etfVal / totalVal : 0;
         decimal blendedRate = etfShare * 0.41m + (1 - etfShare) * 0.33m;
         return gross - (gain * blendedRate);
+    }
+
+    private decimal TargetFor(string ticker) => ticker switch
+    {
+        "NVDA" => 25m,
+        "UNH" => 15m,
+        "VUSA.AS" => 35m,
+        "IUSA.AS" => 70m,
+        "GC=F" => 1000m,    // Gold: 1 kg
+        "SI=F" => 3000m,   // Silver: 3 kg
+        "NWG.L" => 500m,
+        "AZN" => 25m,
+        "EVTL" => 300m,
+        "SPCX" => 25m,
+        _ => 0m       // no target set
+    };
+
+    // Grams held for a metal (oz × 31.1034768)
+    private decimal MetalGrams(PortfolioHolding h)
+    {
+        var oz = Store.Data.Transactions
+            .Where(t => t.HoldingId == h.Id)
+            .Sum(t => t.QuantityReceived);
+        return oz * 31.1034768m;
     }
 }
