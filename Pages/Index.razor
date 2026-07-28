@@ -835,16 +835,16 @@ else
 
     private decimal TargetFor(string ticker) => ticker switch
     {
-        "NVDA" => 25m,
+        "NVDA" => 30m,
         "UNH" => 15m,
-        "VUSA.AS" => 35m,
-        "IUSA.AS" => 70m,
+        "VUSA.AS" => 40m,
+        "IUSA.AS" => 75m,
         "GC=F" => 1000m,    // Gold: 1 kg
         "SI=F" => 3000m,   // Silver: 3 kg
-        "NWG.L" => 500m,
-        "AZN" => 25m,
+        "NWG.L" => 650m,
+        "AZN" => 35m,
         "EVTL" => 300m,
-        "SPCX" => 25m,
+        "SPCX" => 50m,
         _ => 0m       // no target set
     };
 

@@ -1,6 +1,6 @@
 {
-  "UsdToEurRate": 0.87451,
-  "GbpToEurRate": 1.1751,
+  "UsdToEurRate": 0.87804,
+  "GbpToEurRate": 1.1693,
   "AnnualCgtAllowance": 1270,
   "CgtSales": [
     {
@@ -179,13 +179,14 @@
       "Id": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
       "Name": "NVIDIA",
       "StartDate": "2026-02-06",
-      "Value": 267,
+      "Value": 605,
       "Currency": "USD",
       "TickerSymbol": "NVDA",
       "IsMetal": false,
       "GramsHeld": 0,
       "SharesHeld": 0,
-      "InvestedAmount": 0
+      "InvestedAmount": 0,
+      "TargetQuantity": 0
     },
     {
       "Id": "8f8428f3-0436-4a35-a56b-006e6fdfb5c1",
@@ -197,67 +198,73 @@
       "IsMetal": false,
       "GramsHeld": 0,
       "SharesHeld": 0,
-      "InvestedAmount": 0
+      "InvestedAmount": 0,
+      "TargetQuantity": 0
     },
     {
       "Id": "7956f845-1282-4d46-9117-8b69815a02cf",
       "Name": "UnitedHealth",
       "StartDate": "2026-02-06",
-      "Value": 60,
+      "Value": 610,
       "Currency": "USD",
       "TickerSymbol": "UNH",
       "IsMetal": false,
       "GramsHeld": 0,
       "SharesHeld": 0,
-      "InvestedAmount": 0
+      "InvestedAmount": 0,
+      "TargetQuantity": 0
     },
     {
       "Id": "c99c7252-e341-40f8-9712-2f0ea5f0cf1d",
       "Name": "Vanguard S\u0026P 500",
       "StartDate": "2026-02-06",
-      "Value": 60,
+      "Value": 474,
       "Currency": "EUR",
       "TickerSymbol": "VUSA.AS",
       "IsMetal": false,
       "GramsHeld": 0,
       "SharesHeld": 0,
-      "InvestedAmount": 0
+      "InvestedAmount": 0,
+      "TargetQuantity": 0
     },
     {
       "Id": "0ca5674e-aae6-428a-bdd0-51e98f6dded3",
       "Name": "iShares Core S\u0026P 500",
       "StartDate": "2026-02-06",
-      "Value": 60,
+      "Value": 506,
       "Currency": "EUR",
       "TickerSymbol": "IUSA.AS",
       "IsMetal": false,
       "GramsHeld": 0,
       "SharesHeld": 0,
-      "InvestedAmount": 0
+      "InvestedAmount": 0,
+      "TargetQuantity": 0
     },
     {
       "Id": "f0f20476-30a4-49cf-8b28-83e0b9df0f6e",
       "Name": "NatWest",
       "StartDate": "2026-06-23",
-      "Value": 70.05,
+      "Value": 751.05,
       "Currency": "EUR",
       "TickerSymbol": "NWG.L",
       "IsMetal": false,
       "GramsHeld": 0,
       "SharesHeld": 0,
-      "InvestedAmount": 0
+      "InvestedAmount": 0,
+      "TargetQuantity": 0
     },
     {
       "Id": "1f103c25-0ca7-4bd1-b518-5a0ac3d807a7",
       "Name": "Astra Zeneca",
       "StartDate": "2026-07-01",
-      "Value": 69.99,
+      "Value": 854.99,
       "Currency": "USD",
       "TickerSymbol": "AZN",
       "IsMetal": false,
       "GramsHeld": 0,
       "SharesHeld": 0,
-      "InvestedAmount": 0
+      "InvestedAmount": 0,
+      "TargetQuantity": 0
     },
     {
       "Id": "cdd297b0-5ce9-4194-baa7-f4a37ca1a423",
@@ -269,7 +276,8 @@
       "IsMetal": false,
       "GramsHeld": 0,
       "SharesHeld": 0,
-      "InvestedAmount": 0
+      "InvestedAmount": 0,
+      "TargetQuantity": 0
     },
     {
       "Id": "4385356c-9b3a-4df4-b9a2-7d5b70379873",
@@ -281,19 +289,21 @@
       "IsMetal": false,
       "GramsHeld": 0,
       "SharesHeld": 0,
-      "InvestedAmount": 0
+      "InvestedAmount": 0,
+      "TargetQuantity": 0
     },
     {
       "Id": "beed710a-7dd0-44fd-9161-7a8c41d9bc25",
       "Name": "Space X",
       "StartDate": "2026-07-20",
-      "Value": 621,
+      "Value": 878.43,
       "Currency": "USD",
       "TickerSymbol": "SPCX",
       "IsMetal": false,
       "GramsHeld": 0,
       "SharesHeld": 0,
-      "InvestedAmount": 0
+      "InvestedAmount": 0,
+      "TargetQuantity": 0
     }
   ],
   "Transactions": [
@@ -1124,6 +1134,96 @@
       "Fee": 0,
       "NetAmount": 621,
       "QuantityReceived": 4.95379946
+    },
+    {
+      "Id": "8887b2e6-78b6-4a47-b5c2-bd7e17ddc1da",
+      "HoldingId": "beed710a-7dd0-44fd-9161-7a8c41d9bc25",
+      "Date": "2026-07-23",
+      "Amount": 230,
+      "Fee": 0,
+      "NetAmount": 230,
+      "QuantityReceived": 1.99469146
+    },
+    {
+      "Id": "a2e9f34e-884d-4bf8-9939-b9eae0dd8409",
+      "HoldingId": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
+      "Date": "2026-07-27",
+      "Amount": 286,
+      "Fee": 0,
+      "NetAmount": 286,
+      "QuantityReceived": 1.45376913
+    },
+    {
+      "Id": "4a30915e-44c1-497c-ab55-a700964d6d15",
+      "HoldingId": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
+      "Date": "2026-07-27",
+      "Amount": 52,
+      "Fee": 0,
+      "NetAmount": 52,
+      "QuantityReceived": 0.2644023
+    },
+    {
+      "Id": "e513a773-5828-4213-99dc-b4ac00d89df5",
+      "HoldingId": "c99c7252-e341-40f8-9712-2f0ea5f0cf1d",
+      "Date": "2026-07-27",
+      "Amount": 414,
+      "Fee": 0,
+      "NetAmount": 414,
+      "QuantityReceived": 3.3605299
+    },
+    {
+      "Id": "1d1d312a-e6f6-47dd-89de-e7c02c961a6a",
+      "HoldingId": "7956f845-1282-4d46-9117-8b69815a02cf",
+      "Date": "2026-07-27",
+      "Amount": 550,
+      "Fee": 0,
+      "NetAmount": 550,
+      "QuantityReceived": 1.31196793
+    },
+    {
+      "Id": "6500a4dc-b802-4065-9c98-341b7f3e4208",
+      "HoldingId": "0ca5674e-aae6-428a-bdd0-51e98f6dded3",
+      "Date": "2026-07-27",
+      "Amount": 441,
+      "Fee": 0,
+      "NetAmount": 441,
+      "QuantityReceived": 6.8070256
+    },
+    {
+      "Id": "aec25f51-7f73-4b95-8edf-54b26782cd12",
+      "HoldingId": "1f103c25-0ca7-4bd1-b518-5a0ac3d807a7",
+      "Date": "2026-07-27",
+      "Amount": 785,
+      "Fee": 0,
+      "NetAmount": 785,
+      "QuantityReceived": 4.57558581
+    },
+    {
+      "Id": "e12d8662-2cea-4b75-bad3-2b8201efd0c2",
+      "HoldingId": "0ca5674e-aae6-428a-bdd0-51e98f6dded3",
+      "Date": "2026-07-27",
+      "Amount": 5,
+      "Fee": 0,
+      "NetAmount": 5,
+      "QuantityReceived": 0.07716049
+    },
+    {
+      "Id": "65ccf6cf-7fa9-4385-bf03-b9c75f276b65",
+      "HoldingId": "beed710a-7dd0-44fd-9161-7a8c41d9bc25",
+      "Date": "2026-07-27",
+      "Amount": 27.43,
+      "Fee": 0,
+      "NetAmount": 27.43,
+      "QuantityReceived": 0.23502593
+    },
+    {
+      "Id": "4701738b-996e-49d8-8955-1dc7ac12ceb1",
+      "HoldingId": "f0f20476-30a4-49cf-8b28-83e0b9df0f6e",
+      "Date": "2026-07-28",
+      "Amount": 681,
+      "Fee": 0,
+      "NetAmount": 681,
+      "QuantityReceived": 85.26836443
     }
   ],
   "Dividends": [

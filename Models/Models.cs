@@ -41,6 +41,7 @@ public class PortfolioHolding
     public decimal GramsHeld { get; set; } = 0; // only used when IsMetal = true
     public decimal SharesHeld { get; set; } = 0; // only used when IsMetal = false, for stocks/ETFs
     public decimal InvestedAmount { get; set; } = 0; // total you've put in (native currency), for P&L comparison
+    public decimal TargetQuantity { get; set; } = 0;
 }
 
 public class Transaction
