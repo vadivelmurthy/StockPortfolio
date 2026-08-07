@@ -50,12 +50,24 @@ public class PriceService
 
             var json = await resp.Content.ReadAsStringAsync();
             using var doc = JsonDocument.Parse(json);
-            var price = doc.RootElement
-                .GetProperty("chart")
-                .GetProperty("result")[0]
-                .GetProperty("meta")
-                .GetProperty("regularMarketPrice")
-                .GetDecimal();
+            var meta = doc.RootElement
+               .GetProperty("chart")
+               .GetProperty("result")[0]
+               .GetProperty("meta");
+            // Prefer the most recent price: post-market > pre-market > regular
+            decimal price;
+            if (meta.TryGetProperty("postMarketPrice", out var post) && post.ValueKind == JsonValueKind.Number && post.GetDecimal() > 0)
+            {
+                price = post.GetDecimal();
+            }
+            else if (meta.TryGetProperty("preMarketPrice", out var pre) && pre.ValueKind == JsonValueKind.Number && pre.GetDecimal() > 0)
+            {
+                price = pre.GetDecimal();
+            }
+            else
+            {
+                price = meta.GetProperty("regularMarketPrice").GetDecimal();
+            }
 
             // ── Metal tickers: handled separately via GetMetalPricePerGramEurAsync
             // No conversion here, return raw USD/oz price

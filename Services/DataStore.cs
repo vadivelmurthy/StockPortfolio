@@ -19,6 +19,7 @@ public class DataStore
         var projectRoot = dir?.FullName ?? AppContext.BaseDirectory;
         _filePath = Path.Combine(projectRoot, "data.json");
         Data = Load();
+        SeedTargetsIfEmpty();
     }
 
     private AppData Load()
@@ -163,6 +164,34 @@ public class DataStore
             File.WriteAllText(_filePath, json);
         }
         OnChange?.Invoke();
+    }
+
+
+
+    private void SeedTargetsIfEmpty()
+    {
+        var targets = new Dictionary<string, (decimal target, decimal monthly)>
+        {
+            ["NVDA"] = (30, 60),
+            ["EVTL"] = (300, 0),    // stopped
+            ["UNH"] = (15, 60),
+            ["VUSA.AS"] = (40, 60),
+            ["IUSA.AS"] = (75, 60),
+            ["NWG.L"] = (650, 90),
+            ["AZN"] = (35, 90),
+            ["SPCX"] = (50, 90),
+            ["GC=F"] = (1000, 320),  // 1kg gold in grams
+            ["SI=F"] = (3000, 100),  // 3kg silver in grams
+        };
+        foreach (var h in Data.Holdings)
+        {
+            if (targets.TryGetValue(h.TickerSymbol, out var t))
+            {
+                if (h.TargetQuantity == 0) h.TargetQuantity = t.target;
+                if (h.MonthlyContribution == 0) h.MonthlyContribution = t.monthly;
+            }
+        }
+        Save();
     }
 
     public string FilePath => _filePath;

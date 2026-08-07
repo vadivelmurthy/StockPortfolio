@@ -1,0 +1,403 @@
+﻿@page "/targets"
+
+@inject DataStore Store
+
+@inject PriceService Prices
+
+@implements IDisposable
+<PageTitle>Targets — Ireland Tax Tracker</PageTitle>
+<div class="targets-page">
+<div class="targets-header">
+<h1>🎯 Target Tracker</h1>
+<p class="subtitle">
+
+            Every holding — stocks, ETFs and metals — with how much is left and how long to reach each goal.
+
+            Reads your live portfolio, so manual buys count automatically.
+</p>
+</div>
+<div class="summary-row">
+<div class="summary-card">
+<span class="summary-label">Holdings on target</span>
+<span class="summary-value">@_rows.Count(r => r.PctComplete >= 100) / @_rows.Count(r => r.Target > 0)</span>
+</div>
+<div class="summary-card">
+<span class="summary-label">Furthest along</span>
+<span class="summary-value">@LeadName()</span>
+</div>
+<div class="summary-card">
+<span class="summary-label">Longest to go</span>
+<span class="summary-value">@LaggardName()</span>
+</div>
+</div>
+<div class="targets-table">
+<div class="t-head">
+<span>Holding</span>
+<span class="num">Have</span>
+<span class="num">Target</span>
+<span class="num">Remaining</span>
+            <span class="num">Invested €</span>
+            <span class="num">Target €</span>
+            <span class="num">Pending €</span>
+<span class="num">Per mo</span>
+<span>Progress</span>
+<span class="num">Time left</span>
+</div>
+
+        @foreach (var r in _rows.Where(r => r.Target > 0 && r.PctComplete < 100).OrderBy(r => r.YearsLeft))
+
+        {
+<div class="t-row @(r.PctComplete >= 100 ? "done" : "")">
+<span class="t-name">
+
+                    @r.Name
+<small>@r.Unit</small>
+</span>
+<span class="num">@r.Have.ToString("N2")</span>
+<span class="num">@r.Target.ToString("N0")</span>
+<span class="num">@r.Remaining.ToString("N2")</span>
+                @if (r.MoneyTarget > 0)
+                {
+                    <span class="num">€@r.InvestedEur.ToString("N0")</span>
+                    <span class="num">€@r.MoneyTarget.ToString("N0")</span>
+                    <span class="num @(r.MoneyPending <= 0 ? "pending-done" : "")">€@r.MoneyPending.ToString("N0")</span>
+                }
+                else
+                {
+                    <span class="num muted">—</span>
+                    <span class="num muted">—</span>
+                    <span class="num muted">—</span>
+                }
+<span class="num">@(r.Monthly > 0 ? $"€{r.Monthly:N0}" : "—")</span>
+<span class="t-bar-cell">
+<div class="t-bar">
+<div class="t-fill @(r.PctComplete >= 100 ? "full" : "")"
+
+                             style="width:@Math.Min(100, r.PctComplete).ToString("F1")%"></div>
+</div>
+<small>@r.PctComplete.ToString("F1")%</small>
+</span>
+<span class="num t-time">
+
+                    @if (r.PctComplete >= 100)
+
+                    {
+<span class="done-tag">✅ done</span>
+
+                    }
+
+                    else if (r.Monthly <= 0)
+
+                    {
+<span class="muted">no plan</span>
+
+                    }
+
+                    else
+
+                    {
+
+                        @($"{(int)r.YearsLeft}y {(int)((r.YearsLeft - (int)r.YearsLeft) * 12)}m")
+
+                    }
+</span>
+</div>
+
+        }
+</div>
+<p class="disclaimer">
+
+        Time estimates assume today's prices hold — real timing shifts as prices move.
+
+        Metals shown in grams. Edit monthly amounts below.
+</p>
+<a href="/" class="back-link">← Back to Portfolio</a>
+</div>
+<style>
+
+    .targets-page { max-width: 1100px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+    .targets-header h1 { font-weight: 800; letter-spacing: -0.02em; margin-bottom: 0.3rem; }
+
+    .subtitle { color: #8b95a7; font-size: 0.9rem; margin-top: 0; }
+
+    .summary-row { display: flex; gap: 1rem; flex-wrap: wrap; margin: 1.5rem 0; }
+
+    .summary-card {
+
+        flex: 1; min-width: 160px; background: linear-gradient(135deg,#1a2438,#141b2b);
+
+        border: 1px solid #263149; border-radius: 12px; padding: 1rem 1.25rem;
+
+        display: flex; flex-direction: column; gap: 0.3rem;
+
+    }
+
+    .pending-done {
+        color: #00d4aa;
+        font-weight: 700;
+    }
+
+    .summary-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: #7a8598; }
+
+    .summary-value { font-size: 1.35rem; font-weight: 700; color: #e8edf5; }
+
+    .targets-table { background:#111826; border:1px solid #232f45; border-radius:14px; overflow:hidden; }
+
+    .t-head, .t-row {
+        display: grid;
+        grid-template-columns: 1.5fr 0.7fr 0.7fr 0.9fr 0.9fr 0.9fr 0.9fr 0.6fr 1.4fr 0.8fr;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.7rem 1rem;
+    }
+
+    .t-head { background:#0d1320; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.05em; color:#6f7b90; border-bottom:1px solid #232f45; }
+
+    .t-row { border-bottom:1px solid #1a2333; font-size:0.9rem; }
+
+    .t-row:last-child { border-bottom:none; }
+
+    .t-row.done { background: rgba(0,212,170,0.05); }
+
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+    .t-name { display:flex; flex-direction:column; font-weight:600; }
+
+    .t-name small { color:#6f7b90; font-weight:400; font-size:0.72rem; }
+
+    .t-bar-cell { display:flex; align-items:center; gap:0.5rem; }
+
+    .t-bar { flex:1; height:7px; background:#0b1120; border-radius:4px; overflow:hidden; }
+
+    .t-fill { height:100%; background:linear-gradient(90deg,#4da6ff,#00d4aa); border-radius:4px; transition:width .4s ease; }
+
+    .t-fill.full { background:#00d4aa; }
+
+    .t-bar-cell small { font-size:0.72rem; color:#8b95a7; min-width:38px; }
+
+    .t-time { font-weight:600; }
+
+    .done-tag { color:#00d4aa; font-weight:700; }
+
+    .muted { color:#6f7b90; }
+
+    .disclaimer { font-size:0.75rem; color:#6f7b90; margin:0.8rem 0 1.5rem; }
+
+    .editor-card { background:#111826; border:1px solid #232f45; border-radius:14px; padding:1.25rem 1.5rem; margin-bottom:1.5rem; }
+
+    .editor-card h3 { margin:0 0 0.2rem; }
+
+    .editor-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:0.8rem; margin-top:1rem; }
+
+    .editor-item { display:flex; align-items:center; gap:0.5rem; }
+
+    .editor-item label { flex:1; font-size:0.85rem; color:#c3ccda; }
+
+    .editor-item input { width:75px; background:#0b1120; border:1px solid #2a3852; border-radius:6px; color:#e8edf5; padding:0.35rem 0.5rem; }
+
+    .editor-item .cur { font-size:0.75rem; color:#6f7b90; }
+
+    .back-link { color:#4da6ff; text-decoration:none; font-size:0.9rem; }
+
+    .back-link:hover { text-decoration:underline; }
+
+    @@media (max-width: 720px) {
+
+        .t-head, .t-row { grid-template-columns: 1.4fr 0.8fr 1fr 1.4fr; }
+
+        .t-head span:nth-child(3), .t-row span:nth-child(3),
+
+        .t-head span:nth-child(5), .t-row span:nth-child(5),
+
+        .t-head span:nth-child(7), .t-row span:nth-child(7) { display:none; }
+
+    }
+</style>
+
+@code {
+
+    private List<TargetRow> _rows = new();
+
+    private Timer? _timer;
+    private decimal MoneyTarget = 5000m;
+
+    protected override async Task OnInitializedAsync()
+
+    {
+
+        await Refresh();
+
+        _timer = new Timer(async _ => await InvokeAsync(Refresh), null,
+
+            TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+
+    }
+
+    private async Task Refresh()
+
+    {
+
+        var rows = new List<TargetRow>();
+
+        foreach (var h in Store.Data.Holdings)
+
+        {
+
+            bool metal = IsMetalTicker(h.TickerSymbol);
+
+            decimal have = metal ? MetalGrams(h) : ActualUnits(h);
+
+            decimal tgt = h.TargetQuantity;
+
+            decimal price = metal ? await MetalPriceEur(h) : await SharePriceNative(h);
+
+            decimal monthly = h.MonthlyContribution;
+
+            decimal sharesPerMonth = price > 0 && monthly > 0 ? monthly / price : 0;
+
+            decimal remaining = Math.Max(0, tgt - have);
+
+            decimal years = sharesPerMonth > 0 ? (remaining / sharesPerMonth) / 12m : 0;
+
+            decimal pct = tgt > 0 ? Math.Min(100, (have / tgt) * 100) : 0;
+            bool isMetal = IsMetalTicker(h.TickerSymbol);
+            decimal investedEur = InvestedEur(h);
+            decimal moneyTarget = isMetal ? 0 : MoneyTarget;   // €5k only for stocks
+            decimal moneyPending = isMetal ? 0 : Math.Max(0, moneyTarget - investedEur);
+
+            rows.Add(new TargetRow
+
+            {
+
+                Name = h.Name,
+
+                Unit = metal ? "grams" : "shares",
+
+                Have = have,
+
+                Target = tgt,
+
+                Remaining = remaining,
+
+                Monthly = monthly,
+
+                PctComplete = pct,
+
+                YearsLeft = years,
+                InvestedEur = investedEur,
+                MoneyTarget = moneyTarget,
+                MoneyPending = moneyPending,
+
+            });
+
+        }
+
+        _rows = rows;
+
+        StateHasChanged();
+
+    }
+
+    private string LeadName() =>
+
+        _rows.Where(r => r.Target > 0 && r.PctComplete < 100 && r.Monthly > 0)
+
+             .OrderBy(r => r.YearsLeft).FirstOrDefault()?.Name ?? "—";
+
+    private string LaggardName() =>
+
+        _rows.Where(r => r.Target > 0 && r.PctComplete < 100 && r.Monthly > 0)
+
+             .OrderByDescending(r => r.YearsLeft).FirstOrDefault()?.Name ?? "—";
+
+    private void UpdateMonthly(PortfolioHolding h, object? value)
+
+    {
+
+        if (decimal.TryParse(value?.ToString(), out var m))
+
+        {
+
+            h.MonthlyContribution = m;
+
+            Store.Save();
+
+            _ = InvokeAsync(Refresh);
+
+        }
+
+    }
+
+    private bool IsMetalTicker(string? t) => t == "GC=F" || t == "SI=F";
+
+    private decimal ActualUnits(PortfolioHolding h) =>
+
+        Store.Data.Transactions.Where(t => t.HoldingId == h.Id).Sum(t => t.QuantityReceived);
+
+    private decimal MetalGrams(PortfolioHolding h) =>
+
+        ActualUnits(h) * 31.1034768m;
+
+    private async Task<decimal> SharePriceNative(PortfolioHolding h)
+
+    {
+
+        var p = await Prices.GetStockPriceAsync(h.TickerSymbol);
+
+        return p ?? 0;
+
+    }
+
+    private async Task<decimal> MetalPriceEur(PortfolioHolding h)
+
+    {
+
+        var perGram = await Prices.GetMetalPricePerGramEurAsync(h.TickerSymbol);
+
+        return perGram ?? 0;
+
+    }
+
+    private decimal InvestedEur(PortfolioHolding h)
+    {
+        // Sum of net amounts you paid, converted to EUR
+        var nativeInvested = Store.Data.Transactions
+            .Where(t => t.HoldingId == h.Id)
+            .Sum(t => t.NetAmount);
+
+        // Convert USD holdings to EUR; EUR holdings as-is
+        return h.Currency == "USD"
+            ? nativeInvested * Store.Data.UsdToEurRate
+            : nativeInvested;
+    }
+
+    public void Dispose() => _timer?.Dispose();
+
+    private class TargetRow
+
+    {
+
+        public string Name { get; set; } = "";
+
+        public string Unit { get; set; } = "";
+
+        public decimal Have { get; set; }
+
+        public decimal Target { get; set; }
+
+        public decimal Remaining { get; set; }
+
+        public decimal Monthly { get; set; }
+
+        public decimal PctComplete { get; set; }
+
+        public decimal YearsLeft { get; set; }
+        public decimal InvestedEur { get; set; }   // how much you've put in
+        public decimal MoneyTarget { get; set; }   // €5,000 goal
+        public decimal MoneyPending { get; set; }  // €5,000 - invested
+
+    }
+
+}
+ 
