@@ -315,6 +315,13 @@ label input, label select { margin-left: 0.4rem; }
     color: #ffdddd;
     margin-top: 0.5rem;
 }
+.pos {
+    color: var(--good) !important;
+}
+
+.neg {
+    color: var(--bad) !important;
+}
 
 @@keyframes pulse-red {
     0%, 100% {
