@@ -1435,6 +1435,14 @@
       "Amount": 0.5801,
       "Currency": "EUR",
       "WithholdingTax": 0.0000
+    },
+    {
+      "Id": "99b315a3-086c-4869-8fff-b44eceb52927",
+      "HoldingId": "f0f20476-30a4-49cf-8b28-83e0b9df0f6e",
+      "Date": "2026-08-13",
+      "Amount": 14.73,
+      "Currency": "EUR",
+      "WithholdingTax": 0.0000
     }
   ],
   "Loan": {
@@ -1446,5 +1454,36 @@
     "MonthlyPayment": 0,
     "LenderName": "",
     "OverPayments": []
+  },
+  "CarLoanData": {
+    "VehicleName": "BMW X3",
+    "Loans": [
+      {
+        "Id": "11111111-1111-1111-1111-111111111111",
+        "LenderName": "Finance Ireland",
+        "OriginalPrincipal": 33824.88,
+        "TotalAmountRepayable": 39989.71,
+        "RemainingBalance": 39989.71,
+        "StandardPayment": 653.11,
+        "PaymentFrequency": "Monthly",
+        "NextPaymentDate": "2026-09-20",
+        "StartDate": "2026-07-20",
+        "IsFixedTotalRepayable": true,
+        "Overpayments": []
+      },
+      {
+        "Id": "22222222-2222-2222-2222-222222222222",
+        "LenderName": "AIB",
+        "OriginalPrincipal": 60000.00,
+        "TotalAmountRepayable": 74193.71,
+        "RemainingBalance": 58891.19,
+        "StandardPayment": 409.91,
+        "PaymentFrequency": "Biweekly",
+        "NextPaymentDate": "2026-08-21",
+        "StartDate": "2026-06-19",
+        "IsFixedTotalRepayable": false,
+        "Overpayments": []
+      }
+    ]
   }
 }

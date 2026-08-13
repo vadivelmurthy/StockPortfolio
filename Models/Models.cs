@@ -95,4 +95,32 @@ public class AppData
     public List<Transaction> Transactions { get; set; } = new();
     public List<Dividend> Dividends { get; set; } = new();
     public HomeLoan? Loan { get; set; }
+    public CarLoan? CarLoanData { get; set; }
+}
+
+public class CarLoan
+{
+    public string VehicleName { get; set; } = "BMW X3";
+    public List<CarLoanAccount> Loans { get; set; } = new();
+}
+public class CarLoanAccount
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string LenderName { get; set; } = "";
+    public decimal OriginalPrincipal { get; set; }
+    public decimal TotalAmountRepayable { get; set; }
+    public decimal RemainingBalance { get; set; }
+    public decimal StandardPayment { get; set; }
+    public string PaymentFrequency { get; set; } = "Monthly";
+    public DateOnly NextPaymentDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    public bool IsFixedTotalRepayable { get; set; } // true = Finance Ireland style (HP), false = AIB style (variable, accrues interest)
+    public List<CarLoanOverpayment> Overpayments { get; set; } = new();
+}
+public class CarLoanOverpayment
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    public decimal Amount { get; set; }
+    public string Notes { get; set; } = "";
 }

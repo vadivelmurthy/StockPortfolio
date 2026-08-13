@@ -1,0 +1,75 @@
+﻿@page "/car-loan"
+@inject DataStore Store
+<h1>Car Loan Repayment — @Loan.VehicleName</h1>
+<p class="subtitle">Tracking both financing accounts on the same vehicle.</p>
+<div class="card" style="margin-bottom:1rem">
+    <strong>Combined Summary</strong>
+    <p>Total remaining principal: <strong>€@CombinedRemaining().ToString("N2")</strong></p>
+    <p>Total remaining (incl. interest): <strong>€@CombinedRemainingTotalRepayable().ToString("N2")</strong></p>
+    <p>Combined monthly-equivalent cost: <strong>€@CombinedMonthlyEquivalent().ToString("N2")</strong></p>
+</div>
+@foreach (var loan in Loan.Loans)
+{
+    <div class="card" style="margin-bottom:1rem">
+        <strong>@loan.LenderName</strong>
+        <label>
+            Remaining Balance (€):
+            <input type="number" step="0.01" @bind="loan.RemainingBalance" @bind:after="Save" />
+        </label>
+        <p>Standard payment: €@loan.StandardPayment.ToString("N2") (@loan.PaymentFrequency)</p>
+        <p>Next payment due: <strong>@loan.NextPaymentDate.ToString("dddd dd MMM yyyy")</strong></p>
+        <p>Payments remaining: <strong>@PaymentsToPayOff(loan)</strong></p>
+        <p>Estimated payoff: <strong>@EstimatedPayoffDate(loan).ToString("MMM yyyy")</strong></p>
+        <p class="muted-text">
+            Original: €@loan.OriginalPrincipal.ToString("N2") |
+            @if (loan.IsFixedTotalRepayable)
+            {
+                <text>Remaining total repayable: €@loan.RemainingBalance.ToString("N2") | Paid off so far: €@InterestPaidOrSaved(loan).ToString("N2")</text>
+            }
+            else
+            {
+                <text>Remaining incl. interest: €@RemainingTotalRepayable(loan).ToString("N2") | Interest cleared so far: €@InterestPaidOrSaved(loan).ToString("N2")</text>
+            }
+        </p>
+        <div style="margin-top:0.75rem; display:flex; gap:0.5rem; align-items:flex-end; flex-wrap:wrap">
+            <button class="primary-btn" @onclick="() => LogEmiPayment(loan)">
+                Log EMI (€@loan.StandardPayment.ToString("N2"))
+            </button>
+            <label>
+                Extra principal payment (€):
+                <input type="number" step="0.01" @bind="_extraAmounts[loan.Id]" style="width:110px" />
+            </label>
+            <label>
+                Note:
+                <input type="text" @bind="_extraNotes[loan.Id]" placeholder="optional" style="width:160px" />
+            </label>
+            <button class="primary-btn" @onclick="() => LogOverpayment(loan)">+ Log Extra Payment</button>
+        </div>
+        @if (loan.Overpayments.Any())
+        {
+            <table class="grid" style="margin-top:0.75rem; font-size:0.85rem">
+                <thead>
+                    <tr><th>Date</th><th>Amount</th><th>Notes</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var op in loan.Overpayments.OrderByDescending(o => o.Date))
+                    {
+                        <tr>
+                            <td>@op.Date.ToString("dd MMM yyyy")</td>
+                            <td class="num">€@op.Amount.ToString("N2")</td>
+                            <td>@op.Notes</td>
+                            <td><button class="link-btn" @onclick="() => RemoveOverpayment(loan, op)">✕</button></td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><strong>Total extra paid</strong></td>
+                        <td class="num"><strong>€@loan.Overpayments.Sum(o => o.Amount).ToString("N2")</strong></td>
+                        <td colspan="2"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        }
+    </div>
+}
