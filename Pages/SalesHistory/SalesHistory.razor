@@ -1,0 +1,49 @@
+﻿@page "/sales-history"
+@inject DataStore Store
+<h1>Sales History by Stock</h1>
+<p class="subtitle">Realized gains and losses, grouped by holding, across all years.</p>
+<table class="grid">
+    <thead>
+        <tr>
+            <th>Stock/ETF</th>
+            <th>Total Sold (units)</th>
+            <th>Total Invested (€)</th>
+            <th>Total Sale Proceeds (€)</th>
+            <th>Total Gain/Loss (€)</th>
+            <th>Return %</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var group in SalesGroupedByStock())
+        {
+            <tr>
+                <td><strong>@group.StockOrEtf</strong></td>
+                <td class="num">@group.TotalQuantity.ToString("N4")</td>
+                <td class="num">€@group.TotalInvested.ToString("N2")</td>
+                <td class="num">€@group.TotalProceeds.ToString("N2")</td>
+                <td class="num @(group.GainLoss >= 0 ? "pos" : "neg")">
+                    <strong>@(group.GainLoss >= 0 ? "+" : "")€@group.GainLoss.ToString("N2")</strong>
+                </td>
+                <td class="num @(group.GainLoss >= 0 ? "pos" : "neg")">
+                    @(group.ReturnPct >= 0 ? "+" : "")@group.ReturnPct.ToString("N1")%
+                </td>
+            </tr>
+        }
+        @if (!SalesGroupedByStock().Any())
+        {
+            <tr><td colspan="6" class="muted-text">No sales recorded yet.</td></tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td><strong>Total</strong></td>
+            <td></td>
+            <td class="num"><strong>€@OverallInvested().ToString("N2")</strong></td>
+            <td class="num"><strong>€@OverallProceeds().ToString("N2")</strong></td>
+            <td class="num @(OverallGainLoss() >= 0 ? "pos" : "neg")">
+                <strong>@(OverallGainLoss() >= 0 ? "+" : "")€@OverallGainLoss().ToString("N2")</strong>
+            </td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>

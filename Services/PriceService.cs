@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace IrelandTaxTracker.Services;
 
@@ -141,6 +142,12 @@ public class PriceService
             {
                 var timestamp = div.Value.GetProperty("date").GetInt64();
                 var amount = div.Value.GetProperty("amount").GetDecimal();
+                if (IsGBXTicker(symbol))
+                {
+                    decimal gbp = amount / 100m;
+                    decimal gbpEur = await GetGbpToEurAsync() ?? 1.17m;
+                    amount = gbp * gbpEur;
+                }
                 var date = DateOnly.FromDateTime(DateTimeOffset.FromUnixTimeSeconds(timestamp).Date);
                 result.Add((date, amount));
             }
@@ -177,6 +184,13 @@ public class PriceService
                         payDate = DateOnly.FromDateTime(DateTimeOffset.FromUnixTimeSeconds(divDate.GetInt64()).Date);
                     if (quote.TryGetProperty("trailingAnnualDividendRate", out var rate) && rate.ValueKind != JsonValueKind.Null)
                         amount = rate.GetDecimal() / 4;
+                    if (IsGBXTicker(symbol))
+                    {
+                        decimal gbp = amount / 100m;
+                        decimal gbpEur = await GetGbpToEurAsync() ?? 1.17m;
+                        amount = gbp * gbpEur;
+                    }
+
                     if (amount > 0 || exDate.HasValue)
                         return (exDate, payDate, amount);
                 }
@@ -200,6 +214,13 @@ public class PriceService
                 {
                     var ts = first.Value.GetProperty("date").GetInt64();
                     var amt = first.Value.GetProperty("amount").GetDecimal();
+                    if (IsGBXTicker(symbol))
+                    {
+                        decimal gbp = amt / 100m;
+                        decimal gbpEur = await GetGbpToEurAsync() ?? 1.17m;
+                        amt = gbp * gbpEur;
+                    }
+
                     var exDate = DateOnly.FromDateTime(DateTimeOffset.FromUnixTimeSeconds(ts).Date);
                     return (exDate, null, amt);
                 }
@@ -215,6 +236,12 @@ public class PriceService
                 metaPayDate = DateOnly.FromDateTime(DateTimeOffset.FromUnixTimeSeconds(pD.GetInt64()).Date);
             if (meta.TryGetProperty("trailingAnnualDividendRate", out var r))
                 metaAmount = r.GetDecimal() / 4;
+            if (IsGBXTicker(symbol))
+            {
+                decimal gbp = metaAmount / 100m;
+                decimal gbpEur = await GetGbpToEurAsync() ?? 1.17m;
+                metaAmount = gbp * gbpEur;
+            }
             if (metaExDate.HasValue || metaAmount > 0)
                 return (metaExDate, metaPayDate, metaAmount);
         }
