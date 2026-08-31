@@ -1,6 +1,6 @@
 {
-  "UsdToEurRate": 0.86618,
-  "GbpToEurRate": 1.1715,
+  "UsdToEurRate": 0.86237,
+  "GbpToEurRate": 1.1676,
   "AnnualCgtAllowance": 1270,
   "CgtSales": [
     {
@@ -1463,26 +1463,58 @@
         "LenderName": "Finance Ireland",
         "OriginalPrincipal": 33824.88,
         "TotalAmountRepayable": 39989.71,
-        "RemainingBalance": 39989.71,
+        "RemainingBalance": 39261.60,
         "StandardPayment": 653.11,
         "PaymentFrequency": "Monthly",
         "NextPaymentDate": "2026-09-20",
         "StartDate": "2026-07-20",
         "IsFixedTotalRepayable": true,
-        "Overpayments": []
+        "Overpayments": [
+          {
+            "Id": "d72e2ebc-9a54-4800-8913-257ecf24cde9",
+            "Date": "2026-08-20",
+            "Amount": 728.11,
+            "Notes": "20-aug-2026"
+          }
+        ]
       },
       {
         "Id": "22222222-2222-2222-2222-222222222222",
         "LenderName": "AIB",
         "OriginalPrincipal": 60000.00,
         "TotalAmountRepayable": 74193.71,
-        "RemainingBalance": 58891.19,
+        "RemainingBalance": 58438.94,
         "StandardPayment": 409.91,
         "PaymentFrequency": "Biweekly",
-        "NextPaymentDate": "2026-08-21",
+        "NextPaymentDate": "2026-09-04",
         "StartDate": "2026-06-19",
         "IsFixedTotalRepayable": false,
-        "Overpayments": []
+        "Overpayments": [
+          {
+            "Id": "815b1c6c-fa29-45a6-8e00-33f7d16501a8",
+            "Date": "2026-08-20",
+            "Amount": 2.97,
+            "Notes": "13-aug-2026"
+          },
+          {
+            "Id": "3d92337f-7947-4c9c-8f76-763f25d33b28",
+            "Date": "2026-08-20",
+            "Amount": 21.89,
+            "Notes": "20-aug-2026"
+          },
+          {
+            "Id": "9dbcd69a-6351-4e1a-9e24-91f1306e80ec",
+            "Date": "2026-08-31",
+            "Amount": 17.48,
+            "Notes": "21-aug-2026"
+          },
+          {
+            "Id": "c8696af1-2f88-4412-94b2-fe3fd0d554a6",
+            "Date": "2026-08-31",
+            "Amount": 409.91,
+            "Notes": "EMI payment"
+          }
+        ]
       }
     ]
   }

@@ -53,17 +53,16 @@ namespace IrelandTaxTracker.Pages.CarLoanRepayment
         }
 
         private void LogEmiPayment(CarLoanAccount loan)
-
         {
-
             loan.RemainingBalance -= loan.StandardPayment;
-
+            loan.Overpayments.Add(new CarLoanOverpayment
+            {
+                Amount = loan.StandardPayment,
+                Notes = "EMI payment"
+            });
             loan.NextPaymentDate = loan.NextPaymentDate.AddDays(
-
                 loan.PaymentFrequency == "Biweekly" ? 14 : 30);
-
             Store.Save();
-
         }
 
         // Estimate how much of the original "total repayable" (incl. interest) remains,
