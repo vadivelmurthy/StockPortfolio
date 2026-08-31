@@ -1,6 +1,6 @@
 {
-  "UsdToEurRate": 0.8617,
-  "GbpToEurRate": 1.1681,
+  "UsdToEurRate": 0.86237,
+  "GbpToEurRate": 1.1676,
   "AnnualCgtAllowance": 1270,
   "CgtSales": [
     {
@@ -1483,10 +1483,10 @@
         "LenderName": "AIB",
         "OriginalPrincipal": 60000.00,
         "TotalAmountRepayable": 74193.71,
-        "RemainingBalance": 58866.33,
+        "RemainingBalance": 58438.94,
         "StandardPayment": 409.91,
         "PaymentFrequency": "Biweekly",
-        "NextPaymentDate": "2026-08-21",
+        "NextPaymentDate": "2026-09-04",
         "StartDate": "2026-06-19",
         "IsFixedTotalRepayable": false,
         "Overpayments": [
@@ -1501,6 +1501,18 @@
             "Date": "2026-08-20",
             "Amount": 21.89,
             "Notes": "20-aug-2026"
+          },
+          {
+            "Id": "9dbcd69a-6351-4e1a-9e24-91f1306e80ec",
+            "Date": "2026-08-31",
+            "Amount": 17.48,
+            "Notes": "21-aug-2026"
+          },
+          {
+            "Id": "c8696af1-2f88-4412-94b2-fe3fd0d554a6",
+            "Date": "2026-08-31",
+            "Amount": 409.91,
+            "Notes": "EMI payment"
           }
         ]
       }

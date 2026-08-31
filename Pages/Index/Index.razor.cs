@@ -6,7 +6,7 @@ namespace IrelandTaxTracker.Pages.Index
     public partial class Index
     {
         private decimal MonthlyContribution = 1000;
-        private decimal AnnualReturnPct = 7;
+        private decimal AnnualReturnPct => AssumedReturnOverride ?? ActualReturnPct();
         private Timer? _timer;
         private DateTime? _lastRefresh;
         private bool _fxError;
@@ -15,11 +15,14 @@ namespace IrelandTaxTracker.Pages.Index
         private Dictionary<string, (DateOnly? exDate, DateOnly? payDate, decimal amount)> _upcomingDividends = new();
         private decimal? ManualOverride = null;
         private DateOnly ExitDate = new DateOnly(2034, 2, 1);
+        private decimal? AssumedReturnOverride;
 
         protected override async Task OnInitializedAsync()
         {
             await RefreshNow();
-            _timer = new Timer(async _ => await InvokeAsync(RefreshNow), null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(5));
+            await FetchUpcomingDividendsAsync();
+            _timer = new Timer(async _ => await InvokeAsync(RefreshNow), null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(5));
+
         }
 
         private async Task RefreshNow()
@@ -54,7 +57,8 @@ namespace IrelandTaxTracker.Pages.Index
             }
 
             await FetchAndSaveDividendsAsync();
-            await FetchUpcomingDividendsAsync();
+            AssumedReturnOverride ??= Math.Round(ActualReturnPct() ,2);
+            // await FetchUpcomingDividendsAsync();
             _lastRefresh = DateTime.Now;
             Store.Save();
             StateHasChanged();
