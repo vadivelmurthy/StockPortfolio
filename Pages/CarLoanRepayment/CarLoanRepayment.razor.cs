@@ -7,12 +7,14 @@ namespace IrelandTaxTracker.Pages.CarLoanRepayment
         private CarLoan Loan => Store.Data.CarLoanData ??= new CarLoan();
         private Dictionary<Guid, decimal> _extraAmounts = new();
         private Dictionary<Guid, string> _extraNotes = new();
+        private Dictionary<Guid, decimal> _interestAmounts = new();
         protected override void OnInitialized()
         {
             foreach (var loan in Loan.Loans)
             {
                 _extraAmounts[loan.Id] = 0;
                 _extraNotes[loan.Id] = "";
+                _interestAmounts[loan.Id] = 0;
             }
         }
         private void Save() => Store.Save();
@@ -88,6 +90,20 @@ namespace IrelandTaxTracker.Pages.CarLoanRepayment
             var originalInterest = loan.TotalAmountRepayable - loan.OriginalPrincipal;
             var remainingInterest = RemainingTotalRepayable(loan) - loan.RemainingBalance;
             return originalInterest - remainingInterest;
+        }
+
+        private void LogInterestCharged(CarLoanAccount loan, decimal interestAmount)
+        {
+            if (interestAmount <= 0) return;
+            loan.RemainingBalance += interestAmount;
+            loan.InterestPaidToDate -= interestAmount; // or a separate "InterestAccrued" field, your call
+            Store.Save();
+        }
+        private void LogInterestChargedClick(CarLoanAccount loan)
+        {
+            var amount = _interestAmounts.GetValueOrDefault(loan.Id, 0);
+            LogInterestCharged(loan, amount);
+            _interestAmounts[loan.Id] = 0;
         }
 
         private decimal CombinedRemainingTotalRepayable() =>

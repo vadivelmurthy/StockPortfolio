@@ -1,6 +1,6 @@
 {
-  "UsdToEurRate": 0.86237,
-  "GbpToEurRate": 1.1676,
+  "UsdToEurRate": 0.91449,
+  "GbpToEurRate": 1.1943,
   "AnnualCgtAllowance": 1270,
   "CgtSales": [
     {
@@ -179,7 +179,7 @@
       "Id": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
       "Name": "NVIDIA",
       "StartDate": "2026-02-06",
-      "Value": 665,
+      "Value": 1379.36,
       "Currency": "USD",
       "TickerSymbol": "NVDA",
       "IsMetal": false,
@@ -187,7 +187,7 @@
       "SharesHeld": 0,
       "InvestedAmount": 0,
       "TargetQuantity": 30,
-      "MonthlyContribution": 60
+      "MonthlyContribution": 110
     },
     {
       "Id": "8f8428f3-0436-4a35-a56b-006e6fdfb5c1",
@@ -207,7 +207,7 @@
       "Id": "7956f845-1282-4d46-9117-8b69815a02cf",
       "Name": "UnitedHealth",
       "StartDate": "2026-02-06",
-      "Value": 670,
+      "Value": 1095.90,
       "Currency": "USD",
       "TickerSymbol": "UNH",
       "IsMetal": false,
@@ -215,13 +215,13 @@
       "SharesHeld": 0,
       "InvestedAmount": 0,
       "TargetQuantity": 15,
-      "MonthlyContribution": 60
+      "MonthlyContribution": 110
     },
     {
       "Id": "c99c7252-e341-40f8-9712-2f0ea5f0cf1d",
       "Name": "Vanguard S\u0026P 500",
       "StartDate": "2026-02-06",
-      "Value": 534,
+      "Value": 997.44,
       "Currency": "EUR",
       "TickerSymbol": "VUSA.AS",
       "IsMetal": false,
@@ -229,13 +229,13 @@
       "SharesHeld": 0,
       "InvestedAmount": 0,
       "TargetQuantity": 40,
-      "MonthlyContribution": 60
+      "MonthlyContribution": 110
     },
     {
       "Id": "0ca5674e-aae6-428a-bdd0-51e98f6dded3",
       "Name": "iShares Core S\u0026P 500",
       "StartDate": "2026-02-06",
-      "Value": 566,
+      "Value": 890.17,
       "Currency": "EUR",
       "TickerSymbol": "IUSA.AS",
       "IsMetal": false,
@@ -243,13 +243,13 @@
       "SharesHeld": 0,
       "InvestedAmount": 0,
       "TargetQuantity": 75,
-      "MonthlyContribution": 60
+      "MonthlyContribution": 110
     },
     {
       "Id": "f0f20476-30a4-49cf-8b28-83e0b9df0f6e",
       "Name": "NatWest",
       "StartDate": "2026-06-23",
-      "Value": 841.05,
+      "Value": 1145.05,
       "Currency": "EUR",
       "TickerSymbol": "NWG.L",
       "IsMetal": false,
@@ -257,13 +257,13 @@
       "SharesHeld": 0,
       "InvestedAmount": 0,
       "TargetQuantity": 650,
-      "MonthlyContribution": 90
+      "MonthlyContribution": 110
     },
     {
       "Id": "1f103c25-0ca7-4bd1-b518-5a0ac3d807a7",
       "Name": "Astra Zeneca",
       "StartDate": "2026-07-01",
-      "Value": 1244.99,
+      "Value": 1549.98,
       "Currency": "USD",
       "TickerSymbol": "AZN",
       "IsMetal": false,
@@ -271,13 +271,13 @@
       "SharesHeld": 0,
       "InvestedAmount": 0,
       "TargetQuantity": 35,
-      "MonthlyContribution": 90
+      "MonthlyContribution": 110
     },
     {
       "Id": "beed710a-7dd0-44fd-9161-7a8c41d9bc25",
       "Name": "Space X",
       "StartDate": "2026-07-20",
-      "Value": 1230.43,
+      "Value": 1618.18,
       "Currency": "USD",
       "TickerSymbol": "SPCX",
       "IsMetal": false,
@@ -285,13 +285,13 @@
       "SharesHeld": 0,
       "InvestedAmount": 0,
       "TargetQuantity": 50,
-      "MonthlyContribution": 90
+      "MonthlyContribution": 110
     },
     {
       "Id": "cdd297b0-5ce9-4194-baa7-f4a37ca1a423",
       "Name": "Gold (XAU)",
       "StartDate": "2026-03-06",
-      "Value": 893.47,
+      "Value": 1843.47,
       "Currency": "EUR",
       "TickerSymbol": "GC=F",
       "IsMetal": false,
@@ -299,13 +299,13 @@
       "SharesHeld": 0,
       "InvestedAmount": 0,
       "TargetQuantity": 1000,
-      "MonthlyContribution": 320
+      "MonthlyContribution": 250
     },
     {
       "Id": "4385356c-9b3a-4df4-b9a2-7d5b70379873",
       "Name": "Silver (XAG)",
       "StartDate": "2026-03-06",
-      "Value": 297.41,
+      "Value": 497.41,
       "Currency": "EUR",
       "TickerSymbol": "SI=F",
       "IsMetal": false,
@@ -314,6 +314,20 @@
       "InvestedAmount": 0,
       "TargetQuantity": 3000,
       "MonthlyContribution": 100
+    },
+    {
+      "Id": "d7e679fd-a84c-47e4-90dc-5a61acbd38ec",
+      "Name": "Van - EURO",
+      "StartDate": "2026-10-19",
+      "Value": 206,
+      "Currency": "EUR",
+      "TickerSymbol": "VEUR.AS",
+      "IsMetal": false,
+      "GramsHeld": 0,
+      "SharesHeld": 0,
+      "InvestedAmount": 0,
+      "TargetQuantity": 0,
+      "MonthlyContribution": 0
     }
   ],
   "Transactions": [
@@ -1369,6 +1383,429 @@
       "Fee": 0,
       "NetAmount": 90,
       "QuantityReceived": 0.54979057
+    },
+    {
+      "Id": "3e1921a8-c4e9-476e-9d69-c26fbe5100fd",
+      "HoldingId": "0ca5674e-aae6-428a-bdd0-51e98f6dded3",
+      "Date": "2026-09-01",
+      "Amount": 60,
+      "Fee": 0,
+      "NetAmount": 60,
+      "QuantityReceived": 0.90848525
+    },
+    {
+      "Id": "3efcee41-73e3-4260-8e94-d2bbe1a18df0",
+      "HoldingId": "c99c7252-e341-40f8-9712-2f0ea5f0cf1d",
+      "Date": "2026-09-01",
+      "Amount": 60,
+      "Fee": 0,
+      "NetAmount": 60,
+      "QuantityReceived": 0.47745991
+    },
+    {
+      "Id": "2232942c-df5f-4a46-bc72-18221c562f50",
+      "HoldingId": "beed710a-7dd0-44fd-9161-7a8c41d9bc25",
+      "Date": "2026-09-01",
+      "Amount": 141,
+      "Fee": 0,
+      "NetAmount": 141,
+      "QuantityReceived": 1.0091529
+    },
+    {
+      "Id": "22ed93a2-c993-4dea-87f7-8d4da0d6552c",
+      "HoldingId": "0ca5674e-aae6-428a-bdd0-51e98f6dded3",
+      "Date": "2026-09-01",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 0.75533264
+    },
+    {
+      "Id": "13a71387-7163-4b03-9a98-7980c374b283",
+      "HoldingId": "c99c7252-e341-40f8-9712-2f0ea5f0cf1d",
+      "Date": "2026-09-01",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 0.3967159
+    },
+    {
+      "Id": "3482c5f6-ba22-4d72-a523-4415259f8a9c",
+      "HoldingId": "cdd297b0-5ce9-4194-baa7-f4a37ca1a423",
+      "Date": "2026-09-01",
+      "Amount": 200,
+      "Fee": 0,
+      "NetAmount": 200,
+      "QuantityReceived": 0.051292
+    },
+    {
+      "Id": "3480b6e4-47ec-4b88-9a60-ee141ac7f011",
+      "HoldingId": "4385356c-9b3a-4df4-b9a2-7d5b70379873",
+      "Date": "2026-09-01",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 0.840217
+    },
+    {
+      "Id": "d9043e3e-7f6d-40a5-8b3d-f93a7d30e711",
+      "HoldingId": "f0f20476-30a4-49cf-8b28-83e0b9df0f6e",
+      "Date": "2026-09-01",
+      "Amount": 90,
+      "Fee": 0,
+      "NetAmount": 90,
+      "QuantityReceived": 11.38131393
+    },
+    {
+      "Id": "5a34ab9c-3a00-4f9b-9051-e042d2484f8c",
+      "HoldingId": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
+      "Date": "2026-09-01",
+      "Amount": 60,
+      "Fee": 0,
+      "NetAmount": 60,
+      "QuantityReceived": 0.27534303
+    },
+    {
+      "Id": "3dc08e1f-2250-40bf-8243-6ee08e2030cd",
+      "HoldingId": "7956f845-1282-4d46-9117-8b69815a02cf",
+      "Date": "2026-09-03",
+      "Amount": 60,
+      "Fee": 0,
+      "NetAmount": 60,
+      "QuantityReceived": 0.14994002
+    },
+    {
+      "Id": "2e7c5d14-859f-40ea-b33a-699814ae3250",
+      "HoldingId": "1f103c25-0ca7-4bd1-b518-5a0ac3d807a7",
+      "Date": "2026-09-03",
+      "Amount": 90,
+      "Fee": 0,
+      "NetAmount": 90,
+      "QuantityReceived": 0.54718298
+    },
+    {
+      "Id": "b562eacd-8453-4127-b07b-ee3c35723207",
+      "HoldingId": "7956f845-1282-4d46-9117-8b69815a02cf",
+      "Date": "2026-09-21",
+      "Amount": 14.65,
+      "Fee": 0,
+      "NetAmount": 14.65,
+      "QuantityReceived": 0.03876305
+    },
+    {
+      "Id": "08d43278-1048-40fd-b04c-9ad47ef88678",
+      "HoldingId": "7956f845-1282-4d46-9117-8b69815a02cf",
+      "Date": "2026-09-21",
+      "Amount": 8.80,
+      "Fee": 0,
+      "NetAmount": 8.80,
+      "QuantityReceived": 0.02352124
+    },
+    {
+      "Id": "fa4350c7-bf28-4586-a348-61ea7dad4580",
+      "HoldingId": "7956f845-1282-4d46-9117-8b69815a02cf",
+      "Date": "2026-09-21",
+      "Amount": 185,
+      "Fee": 0,
+      "NetAmount": 185,
+      "QuantityReceived": 0.4936361
+    },
+    {
+      "Id": "daca5fdf-f12a-4091-a3b4-4d45dbcccc6d",
+      "HoldingId": "7956f845-1282-4d46-9117-8b69815a02cf",
+      "Date": "2026-09-28",
+      "Amount": 5.40,
+      "Fee": 0,
+      "NetAmount": 5.40,
+      "QuantityReceived": 0.014592
+    },
+    {
+      "Id": "6123c013-62e7-41c9-baf8-e3bc06f1fb7b",
+      "HoldingId": "7956f845-1282-4d46-9117-8b69815a02cf",
+      "Date": "2026-10-01",
+      "Amount": 146.65,
+      "Fee": 0,
+      "NetAmount": 146.65,
+      "QuantityReceived": 0.390229
+    },
+    {
+      "Id": "1d2941b1-cdab-42a8-98b2-484d8ae37900",
+      "HoldingId": "beed710a-7dd0-44fd-9161-7a8c41d9bc25",
+      "Date": "2026-10-01",
+      "Amount": 146.75,
+      "Fee": 0,
+      "NetAmount": 146.75,
+      "QuantityReceived": 1.00038758
+    },
+    {
+      "Id": "c688f4c6-df6e-425a-8f1c-9b53ca688585",
+      "HoldingId": "cdd297b0-5ce9-4194-baa7-f4a37ca1a423",
+      "Date": "2026-10-02",
+      "Amount": 250,
+      "Fee": 0,
+      "NetAmount": 250,
+      "QuantityReceived": 0.066542
+    },
+    {
+      "Id": "51575fb5-d5ed-4581-9626-10f0b630fb1b",
+      "HoldingId": "4385356c-9b3a-4df4-b9a2-7d5b70379873",
+      "Date": "2026-10-02",
+      "Amount": 20,
+      "Fee": 0,
+      "NetAmount": 20,
+      "QuantityReceived": 0.34469
+    },
+    {
+      "Id": "57b95442-d3c6-43d7-8e5d-bdc73d967242",
+      "HoldingId": "4385356c-9b3a-4df4-b9a2-7d5b70379873",
+      "Date": "2026-10-02",
+      "Amount": 80,
+      "Fee": 0,
+      "NetAmount": 80,
+      "QuantityReceived": 1.448605
+    },
+    {
+      "Id": "70512e0a-4b5e-4cb9-b2eb-fef35d863be8",
+      "HoldingId": "0ca5674e-aae6-428a-bdd0-51e98f6dded3",
+      "Date": "2026-10-02",
+      "Amount": 101.63,
+      "Fee": 0,
+      "NetAmount": 101.63,
+      "QuantityReceived": 1.5
+    },
+    {
+      "Id": "1e9ffef2-b838-4338-a604-ccab17e2e1ec",
+      "HoldingId": "c99c7252-e341-40f8-9712-2f0ea5f0cf1d",
+      "Date": "2026-10-02",
+      "Amount": 103.44,
+      "Fee": 0,
+      "NetAmount": 103.44,
+      "QuantityReceived": 0.8
+    },
+    {
+      "Id": "f6ba0aba-6ec8-4769-ae02-dc3a57516d93",
+      "HoldingId": "1f103c25-0ca7-4bd1-b518-5a0ac3d807a7",
+      "Date": "2026-10-02",
+      "Amount": 114.99,
+      "Fee": 0,
+      "NetAmount": 114.99,
+      "QuantityReceived": 0.7082167
+    },
+    {
+      "Id": "73c2226d-8bea-4148-aee3-0b3c9821714d",
+      "HoldingId": "f0f20476-30a4-49cf-8b28-83e0b9df0f6e",
+      "Date": "2026-10-02",
+      "Amount": 114,
+      "Fee": 0,
+      "NetAmount": 114,
+      "QuantityReceived": 14.76710835
+    },
+    {
+      "Id": "b4d1c55c-89f5-45a3-96e5-7d569d547d31",
+      "HoldingId": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
+      "Date": "2026-10-02",
+      "Amount": 164.98,
+      "Fee": 0,
+      "NetAmount": 164.98,
+      "QuantityReceived": 0.69426858
+    },
+    {
+      "Id": "52f22708-198c-4e48-84fb-f9177233df1c",
+      "HoldingId": "0e6cf282-ecb8-4547-8973-f4bfeb4f1969",
+      "Date": "2026-10-06",
+      "Amount": 200,
+      "Fee": 0,
+      "NetAmount": 200,
+      "QuantityReceived": 0
+    },
+    {
+      "Id": "3b383810-7ad6-4ecf-9db1-6cc69f787525",
+      "HoldingId": "832c23ee-c01a-4746-a1bd-535d63a92f6d",
+      "Date": "2026-10-19",
+      "Amount": 5,
+      "Fee": 0,
+      "NetAmount": 5,
+      "QuantityReceived": 0
+    },
+    {
+      "Id": "2ef23ae4-33e0-4556-8daa-e2bcce4c7561",
+      "HoldingId": "d7e679fd-a84c-47e4-90dc-5a61acbd38ec",
+      "Date": "2026-10-19",
+      "Amount": 5,
+      "Fee": 0,
+      "NetAmount": 5,
+      "QuantityReceived": 0.101053
+    },
+    {
+      "Id": "f2318bf6-46c2-4193-b179-e2dd4b0ed184",
+      "HoldingId": "beed710a-7dd0-44fd-9161-7a8c41d9bc25",
+      "Date": "2026-11-02",
+      "Amount": 100,
+      "Fee": 0,
+      "NetAmount": 100,
+      "QuantityReceived": 0.68146278
+    },
+    {
+      "Id": "eebe98cb-c516-49cb-bc02-8e03266b90c3",
+      "HoldingId": "1f103c25-0ca7-4bd1-b518-5a0ac3d807a7",
+      "Date": "2026-11-02",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 0.29154518
+    },
+    {
+      "Id": "36a96665-5d66-4ee9-b9df-0cba7398d709",
+      "HoldingId": "0ca5674e-aae6-428a-bdd0-51e98f6dded3",
+      "Date": "2026-11-02",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 0.73772426
+    },
+    {
+      "Id": "41053d9e-9760-4091-ba2f-b6aa2dc46444",
+      "HoldingId": "c99c7252-e341-40f8-9712-2f0ea5f0cf1d",
+      "Date": "2026-11-02",
+      "Amount": 100,
+      "Fee": 0,
+      "NetAmount": 100,
+      "QuantityReceived": 0.7758394
+    },
+    {
+      "Id": "bcade711-6d18-4f04-8207-93a8655103b4",
+      "HoldingId": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
+      "Date": "2026-11-02",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 0.23463558
+    },
+    {
+      "Id": "bff8d5af-321f-422e-9de8-cc1577a28d53",
+      "HoldingId": "cdd297b0-5ce9-4194-baa7-f4a37ca1a423",
+      "Date": "2026-11-02",
+      "Amount": 250,
+      "Fee": 0,
+      "NetAmount": 250,
+      "QuantityReceived": 0.06752
+    },
+    {
+      "Id": "83bc93a6-53e3-4986-a752-15fcff8b296d",
+      "HoldingId": "4385356c-9b3a-4df4-b9a2-7d5b70379873",
+      "Date": "2026-11-02",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 0.981533
+    },
+    {
+      "Id": "54a6a917-6b4c-4529-962b-0c447979d72e",
+      "HoldingId": "d7e679fd-a84c-47e4-90dc-5a61acbd38ec",
+      "Date": "2026-11-02",
+      "Amount": 100,
+      "Fee": 0,
+      "NetAmount": 100,
+      "QuantityReceived": 2.02735497
+    },
+    {
+      "Id": "12e5e714-b0f1-4141-a75f-fbedf083c50b",
+      "HoldingId": "f0f20476-30a4-49cf-8b28-83e0b9df0f6e",
+      "Date": "2026-11-02",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 6.59483637
+    },
+    {
+      "Id": "b6268524-06df-45b1-b0b8-a61dc933fca8",
+      "HoldingId": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
+      "Date": "2026-11-13",
+      "Amount": 169.92,
+      "Fee": 0,
+      "NetAmount": 169.92,
+      "QuantityReceived": 1.0012964
+    },
+    {
+      "Id": "ac60fd78-f80d-4865-bc5e-e21b6d7e77de",
+      "HoldingId": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
+      "Date": "2026-11-16",
+      "Amount": 219.46,
+      "Fee": 0,
+      "NetAmount": 219.46,
+      "QuantityReceived": 1.40652439
+    },
+    {
+      "Id": "c52f7a2e-5722-4e3b-9e31-b9e7911495e2",
+      "HoldingId": "c99c7252-e341-40f8-9712-2f0ea5f0cf1d",
+      "Date": "2026-12-01",
+      "Amount": 150,
+      "Fee": 0,
+      "NetAmount": 150,
+      "QuantityReceived": 1.17279124
+    },
+    {
+      "Id": "2c854a99-a435-45da-8482-b45103a451f8",
+      "HoldingId": "cdd297b0-5ce9-4194-baa7-f4a37ca1a423",
+      "Date": "2026-12-01",
+      "Amount": 250,
+      "Fee": 0,
+      "NetAmount": 250,
+      "QuantityReceived": 0.072523
+    },
+    {
+      "Id": "2db42891-43de-4756-bbce-0f5dbee65346",
+      "HoldingId": "d7e679fd-a84c-47e4-90dc-5a61acbd38ec",
+      "Date": "2026-12-01",
+      "Amount": 101,
+      "Fee": 0,
+      "NetAmount": 101,
+      "QuantityReceived": 2.02055429
+    },
+    {
+      "Id": "c6166766-e587-4da5-a562-c2496a9ea666",
+      "HoldingId": "f0f20476-30a4-49cf-8b28-83e0b9df0f6e",
+      "Date": "2026-12-01",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 7.03287787
+    },
+    {
+      "Id": "481d626e-d422-4ca1-8b4f-6c5f14b55be8",
+      "HoldingId": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
+      "Date": "2026-12-01",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 0.35138773
+    },
+    {
+      "Id": "c7feb629-e623-49a8-8f96-260a8ff9c9f9",
+      "HoldingId": "0ca5674e-aae6-428a-bdd0-51e98f6dded3",
+      "Date": "2026-12-01",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 0.74580113
+    },
+    {
+      "Id": "533ce8ae-9055-479e-a254-be1ac4b4ae13",
+      "HoldingId": "1f103c25-0ca7-4bd1-b518-5a0ac3d807a7",
+      "Date": "2026-12-01",
+      "Amount": 50,
+      "Fee": 0,
+      "NetAmount": 50,
+      "QuantityReceived": 0.31178055
+    },
+    {
+      "Id": "492e18a0-53db-4e41-82cf-a92ceba511a6",
+      "HoldingId": "0ca5674e-aae6-428a-bdd0-51e98f6dded3",
+      "Date": "2026-12-01",
+      "Amount": 12.54,
+      "Fee": 0,
+      "NetAmount": 12.54,
+      "QuantityReceived": 0.19357228
     }
   ],
   "Dividends": [
@@ -1443,6 +1880,38 @@
       "Amount": 14.73,
       "Currency": "EUR",
       "WithholdingTax": 0.0000
+    },
+    {
+      "Id": "687c6c57-7d36-4139-8e19-7a669721ebd3",
+      "HoldingId": "0f88f419-cc91-42ac-b666-dcd6c5df848c",
+      "Date": "2026-09-10",
+      "Amount": 1.2018,
+      "Currency": "USD",
+      "WithholdingTax": 0.1803
+    },
+    {
+      "Id": "243ce74c-7e67-44b7-b9c1-e37ef05e0e66",
+      "HoldingId": "7956f845-1282-4d46-9117-8b69815a02cf",
+      "Date": "2026-09-14",
+      "Amount": 5.8095,
+      "Currency": "USD",
+      "WithholdingTax": 0.8714
+    },
+    {
+      "Id": "9ce400ed-aa04-456a-b522-0f25e6a7f601",
+      "HoldingId": "c99c7252-e341-40f8-9712-2f0ea5f0cf1d",
+      "Date": "2026-09-17",
+      "Amount": 2.0491,
+      "Currency": "EUR",
+      "WithholdingTax": 0.0000
+    },
+    {
+      "Id": "0189ffae-4110-4b95-aa71-5799e62b23b7",
+      "HoldingId": "0ca5674e-aae6-428a-bdd0-51e98f6dded3",
+      "Date": "2026-09-17",
+      "Amount": 2.0662,
+      "Currency": "EUR",
+      "WithholdingTax": 0.0000
     }
   ],
   "Loan": {
@@ -1463,10 +1932,10 @@
         "LenderName": "Finance Ireland",
         "OriginalPrincipal": 33824.88,
         "TotalAmountRepayable": 39989.71,
-        "RemainingBalance": 39261.60,
+        "RemainingBalance": 37302.27,
         "StandardPayment": 653.11,
         "PaymentFrequency": "Monthly",
-        "NextPaymentDate": "2026-09-20",
+        "NextPaymentDate": "2027-02-17",
         "StartDate": "2026-07-20",
         "IsFixedTotalRepayable": true,
         "Overpayments": [
@@ -1475,18 +1944,37 @@
             "Date": "2026-08-20",
             "Amount": 728.11,
             "Notes": "20-aug-2026"
+          },
+          {
+            "Id": "a4d89b2c-c741-4eb9-9105-98c49b778c0a",
+            "Date": "2026-09-21",
+            "Amount": 653.11,
+            "Notes": "EMI payment"
+          },
+          {
+            "Id": "06bd27a3-d59f-44fe-a794-bffd7caa0a42",
+            "Date": "2026-10-20",
+            "Amount": 653.11,
+            "Notes": "EMI payment"
+          },
+          {
+            "Id": "f7d2bc6d-03b8-4adb-9056-0a28ae7b07f4",
+            "Date": "2026-11-20",
+            "Amount": 653.11,
+            "Notes": "EMI payment"
           }
-        ]
+        ],
+        "InterestPaidToDate": 0
       },
       {
         "Id": "22222222-2222-2222-2222-222222222222",
         "LenderName": "AIB",
         "OriginalPrincipal": 60000.00,
         "TotalAmountRepayable": 74193.71,
-        "RemainingBalance": 58438.94,
+        "RemainingBalance": 56572.67,
         "StandardPayment": 409.91,
         "PaymentFrequency": "Biweekly",
-        "NextPaymentDate": "2026-09-04",
+        "NextPaymentDate": "2026-11-27",
         "StartDate": "2026-06-19",
         "IsFixedTotalRepayable": false,
         "Overpayments": [
@@ -1513,8 +2001,75 @@
             "Date": "2026-08-31",
             "Amount": 409.91,
             "Notes": "EMI payment"
+          },
+          {
+            "Id": "8d330c73-47fe-4cc2-a58f-961b2a6cfef7",
+            "Date": "2026-09-04",
+            "Amount": 409.91,
+            "Notes": "EMI payment"
+          },
+          {
+            "Id": "12af9b06-c20c-4840-851e-aba59a98b5eb",
+            "Date": "2026-09-04",
+            "Amount": 47.48,
+            "Notes": "04-sept-2026"
+          },
+          {
+            "Id": "8e83275f-b7da-4c17-b81e-3729bd15c3b6",
+            "Date": "2026-09-14",
+            "Amount": 52.97,
+            "Notes": "14-Sept-2026"
+          },
+          {
+            "Id": "b97a997b-79b8-48ec-8ea1-97738c993a74",
+            "Date": "2026-09-18",
+            "Amount": 409.91,
+            "Notes": "EMI payment"
+          },
+          {
+            "Id": "a7bb4db6-1176-4e19-b95b-702bb7c4de4f",
+            "Date": "2026-09-18",
+            "Amount": 7.49,
+            "Notes": "18-sept-2026"
+          },
+          {
+            "Id": "2baa19b5-5498-4efd-9e87-60573c7ea3d2",
+            "Date": "2026-09-21",
+            "Amount": 46.89,
+            "Notes": "21-sept-2026"
+          },
+          {
+            "Id": "9cb3fd1e-9234-4230-8703-6777f9c0a1de",
+            "Date": "2026-10-02",
+            "Amount": 92.77,
+            "Notes": "2-oct-2026"
+          },
+          {
+            "Id": "7b9722b7-08c3-47d0-a1a4-14088fa24fa3",
+            "Date": "2026-10-02",
+            "Amount": 409.91,
+            "Notes": "EMI payment"
+          },
+          {
+            "Id": "9275ce72-3616-4b7c-9763-f571fa10b4ff",
+            "Date": "2026-10-19",
+            "Amount": 409.91,
+            "Notes": "EMI payment"
+          },
+          {
+            "Id": "114cc363-843d-496c-a4af-311b565f10d0",
+            "Date": "2026-11-13",
+            "Amount": 409.91,
+            "Notes": "EMI payment"
+          },
+          {
+            "Id": "be6ad8de-d5e7-4b83-b179-a9162fae545b",
+            "Date": "2026-11-13",
+            "Amount": 409.91,
+            "Notes": "EMI payment"
           }
-        ]
+        ],
+        "InterestPaidToDate": 0
       }
     ]
   }

@@ -3,7 +3,7 @@
 <h1>Monthly Investment Summary</h1>
 <p class="subtitle">Tracks your monthly contributions vs your €995 target.</p>
 @{
-    var target = 995m;
+    var target = 1250m;
     var grouped = Store.Data.Transactions
         .Where(t => t.Amount > 0)
         .GroupBy(t => new { t.Date.Year, t.Date.Month })

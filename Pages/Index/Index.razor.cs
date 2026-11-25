@@ -16,6 +16,7 @@ namespace IrelandTaxTracker.Pages.Index
         private decimal? ManualOverride = null;
         private DateOnly ExitDate = new DateOnly(2034, 2, 1);
         private decimal? AssumedReturnOverride;
+        private const decimal MetalSellFeePct = 0.02m;
 
         protected override async Task OnInitializedAsync()
         {
@@ -76,10 +77,21 @@ namespace IrelandTaxTracker.Pages.Index
         private decimal InvestedEur(PortfolioHolding h) =>
             h.Currency == "USD" ? InvestedNative(h) * Store.Data.UsdToEurRate : InvestedNative(h);
 
+        //private decimal ToEur(PortfolioHolding h)
+        //{
+        //    if (IsMetalTicker(h.TickerSymbol) && _metalPricesPerGramEur.TryGetValue(h.TickerSymbol, out var gpg) && gpg > 0)
+        //        return ActualUnits(h) * 31.1034768m * gpg;
+        //    if (_livePrices.TryGetValue(h.TickerSymbol, out var price) && price > 0)
+        //    {
+        //        var native = ActualUnits(h) * price;
+        //        return h.Currency == "USD" ? native * Store.Data.UsdToEurRate : native;
+        //    }
+        //    return InvestedEur(h); // fallback to invested if no live price yet
+        //}
         private decimal ToEur(PortfolioHolding h)
         {
             if (IsMetalTicker(h.TickerSymbol) && _metalPricesPerGramEur.TryGetValue(h.TickerSymbol, out var gpg) && gpg > 0)
-                return ActualUnits(h) * 31.1034768m * gpg;
+                return ActualUnits(h) * 31.1034768m * gpg * (1 - MetalSellFeePct);
             if (_livePrices.TryGetValue(h.TickerSymbol, out var price) && price > 0)
             {
                 var native = ActualUnits(h) * price;
@@ -149,7 +161,7 @@ namespace IrelandTaxTracker.Pages.Index
         private (int years, int months) ProjectTarget()
         {
             decimal value = GoalValue();
-            decimal target = 250000m;
+            decimal target = 150000m;
             decimal monthly = EffectiveMonthly();
             decimal monthlyRate = (AnnualReturnPct / 100m) / 12m;
 
@@ -404,16 +416,28 @@ namespace IrelandTaxTracker.Pages.Index
         {
             "NVDA" => 30m,
             "UNH" => 15m,
-            "VUSA.AS" => 40m,
-            "IUSA.AS" => 75m,
+            "VUSA.AS" => 100m,
+            "IUSA.AS" => 20m,
             "GC=F" => 1000m,    // Gold: 1 kg
             "SI=F" => 3000m,   // Silver: 3 kg
-            "NWG.L" => 650m,
-            "AZN" => 35m,
+            "NWG.L" => 1500m,
+            "AZN" => 75m,
             "EVTL" => 300m,
             "SPCX" => 50m,
+            "VEUR.AS" => 150m,
             _ => 0m       // no target set
         };
+
+
+        private async Task<decimal?> GetMetalCurrentValueAsync(PortfolioHolding h)
+        {
+            var pricePerGram = await Prices.GetMetalPricePerGramEurAsync(h.TickerSymbol);
+            if (!pricePerGram.HasValue) return null;
+            var grams = MetalGrams(h);
+            var rawValue = grams * pricePerGram.Value;
+            // Current value reflects realistic sell proceeds after the 2% dealer fee
+            return rawValue * (1 - MetalSellFeePct);
+        }
 
         // Grams held for a metal (oz × 31.1034768)
         private decimal MetalGrams(PortfolioHolding h)
@@ -450,6 +474,7 @@ namespace IrelandTaxTracker.Pages.Index
             var sign = pnl >= 0 ? "+" : "";
             return $"{sign}€{pnl:N2} ({sign}{pct:N1}%)";
         }
+
 
     }
 }

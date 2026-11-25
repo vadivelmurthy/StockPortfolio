@@ -116,6 +116,7 @@ public class CarLoanAccount
     public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Today);
     public bool IsFixedTotalRepayable { get; set; } // true = Finance Ireland style (HP), false = AIB style (variable, accrues interest)
     public List<CarLoanOverpayment> Overpayments { get; set; } = new();
+    public decimal InterestPaidToDate { get; set; } = 0;
 }
 public class CarLoanOverpayment
 {
